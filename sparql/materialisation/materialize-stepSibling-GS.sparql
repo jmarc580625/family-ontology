@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Insert gender-specific step sibling relationships
+# stepSisterOf: female step sibling
+# stepBrotherOf: male step sibling
+
+INSERT {
+  ?stepSib :stepSisterOf ?person .
+}
+WHERE {
+  ?stepSib :stepSiblingOf ?person .
+  ?stepSib a :FemalePerson .
+}
+;
+
+INSERT {
+  ?stepSib :stepBrotherOf ?person .
+}
+WHERE {
+  ?stepSib :stepSiblingOf ?person .
+  ?stepSib a :MalePerson .
+}

@@ -1,0 +1,7 @@
+PREFIX : <http://example.org/family#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?person WHERE {
+    ?person :spouseOf ?person .
+    BIND("Person cannot be their own spouse" AS ?message)
+}

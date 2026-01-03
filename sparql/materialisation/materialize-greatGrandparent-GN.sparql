@@ -1,0 +1,11 @@
+PREFIX : <http://example.org/family#>
+
+INSERT {
+    ?greatgrandparent :greatGrandparentOf ?greatgrandchild .
+}
+WHERE {
+    ?greatgrandparent :parentOf ?grandparent .
+    ?grandparent :parentOf ?parent .
+    ?parent :parentOf ?greatgrandchild .
+#    FILTER NOT EXISTS { ?greatgrandparent :greatGrandparentOf ?greatgrandchild }  # uncomment for idempotency (incremental updates)
+}

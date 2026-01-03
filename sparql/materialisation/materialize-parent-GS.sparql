@@ -1,0 +1,22 @@
+PREFIX : <http://example.org/family#>
+
+# Materialize gender-specific parent relationships
+# Creates :motherOf and :fatherOf from :parentOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?parent :motherOf ?child .
+}
+WHERE {
+    ?parent :parentOf ?child .
+    ?parent a :FemalePerson .
+#    FILTER NOT EXISTS { ?parent :motherOf ?child }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?parent :fatherOf ?child .
+}
+WHERE {
+    ?parent :parentOf ?child .
+    ?parent a :MalePerson .
+#    FILTER NOT EXISTS { ?parent :fatherOf ?child }  # uncomment for idempotency (incremental updates)
+}

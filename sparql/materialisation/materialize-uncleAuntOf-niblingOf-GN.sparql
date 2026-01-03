@@ -1,0 +1,26 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred uncle/aunt relationships and their inverse (nibling)
+# A person is an uncle/aunt if they are:
+# 1. A sibling of one's parent, or
+# 2. Married to a sibling of one's parent
+# Note: Also materializes :niblingOf (inverse) since OWL reasoner doesn't infer
+# inverse properties after SPARQL INSERT operations
+INSERT {
+    ?uncleAunt :uncleAuntOf ?nibling .
+    ?nibling :niblingOf ?uncleAunt .
+}
+WHERE {
+    {
+        # Case 1: Direct siblings of parents
+        ?parent :parentOf ?nibling .
+        ?parent :siblingOf ?uncleAunt .
+    } UNION {
+        # Case 2: Spouses of parents' siblings
+        ?parent :parentOf ?nibling .
+        ?parent :siblingOf ?sibling .
+        ?sibling :spouseOf ?uncleAunt .
+    }
+#    FILTER NOT EXISTS { ?uncleAunt :uncleAuntOf ?nibling }  # uncomment for idempotency (incremental updates)
+#    FILTER NOT EXISTS { ?nibling :niblingOf ?uncleAunt }    # uncomment for idempotency (incremental updates)
+}

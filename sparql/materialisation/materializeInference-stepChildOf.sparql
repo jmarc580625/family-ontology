@@ -1,0 +1,28 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred stepparent relationships
+# A person is a stepparent of another person if:
+# 1. They are the spouse of a parent
+# 2. They are not the biological parent themselves
+INSERT {
+    ?person1 fn:hasStepParent ?person2 .
+}
+WHERE {
+    # First find parent-child relationships
+    ?parent rel:parentOf ?person1 .
+    
+    # Then find the parent's spouse
+    ?parent rel:spouseOf ?person2 .
+    
+    # Make sure the spouse is not also a biological parent
+    # This ensures we only get step-parent relationships
+    FILTER NOT EXISTS { 
+        ?person2 rel:parentOf ?person1 
+    }
+    
+    # Additional debug filter to understand what's being matched
+    FILTER (?person2 != ?parent)
+}
+
+                
+ 

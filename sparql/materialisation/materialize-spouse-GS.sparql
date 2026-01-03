@@ -1,0 +1,22 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred gender-specific spouse relationships
+# wifeOf: female spouse (FemalePerson)
+# husbandOf: male spouse (MalePerson)
+INSERT {
+    ?wife :wifeOf ?spouse .
+    ?husband :husbandOf ?spouse .
+}
+WHERE {
+    {
+        # wifeOf: wife is FemalePerson and spouse of another
+        ?wife :spouseOf ?spouse .
+        ?wife a :FemalePerson .
+    }
+    UNION
+    {
+        # husbandOf: husband is MalePerson and spouse of another
+        ?husband :spouseOf ?spouse .
+        ?husband a :MalePerson .
+    }
+}

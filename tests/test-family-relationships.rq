@@ -1,0 +1,415 @@
+# Test SPARQL Queries for Family Relationship Inference
+# These queries test the inference rules defined in family-ontology.ttl
+# Test data contains these explicit relationships:
+# - Alice parentOf Bob
+# - Alice parentOf Carol
+# - Bob parentOf David
+# - Carol parentOf Eva
+
+# Prefixes
+PREFIX : <http://example.org/family#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rel: <http://purl.org/vocab/relationship/>
+
+#-----------------------------#
+# 0.core family relationships #
+#-----------------------------#
+
+##
+## 0.1 core gender-neutral family relationships
+##
+
+###
+### 0.1.1 Test spouse relationships (explicit in data, reflexive)
+# Expected results:
+# - Alice -> Antoine (Alice is spouse of Antoine)
+# - Antoine -> Alice (Antoine is spouse of Alice)
+# Note: The relationship should be symmetric, only defined one way in the data set
+SELECT ?spouse1 ?spouse2 WHERE {
+  ?spouse1 :spouseOf ?spouse2 .
+}
+ORDER BY ?spouse1 ?spouse2
+
+###
+### 0.1.2 Test direct parent-child relationships (explicit in data, inverse of child)
+# Expected results:
+# - Alice -> Bob (Alice is parent of Bob)
+# - Alice -> Carol (Alice is parent of Carol)
+# - Bob -> David (Bob is parent of David)
+# - Carol -> Eva (Carol is parent of Eva)
+SELECT ?parent ?child WHERE {
+  ?parent :parentOf ?child .
+}
+ORDER BY ?parent ?child
+
+###
+### 0.1.3 Test child-parent relationships (inferred, inverse of parent)
+# Expected results:
+# - Bob -> Alice (Bob is child of Alice)
+# - Carol -> Alice (Carol is child of Alice)
+# - David -> Bob (David is child of Bob)
+# - Eva -> Carol (Eva is child of Carol)
+SELECT ?child ?parent WHERE {
+  ?child :childOf ?parent .
+}
+ORDER BY ?child ?parent
+
+###
+### 0.1.4 Test sibling relationships (inferred)
+# Expected results: (2 rows in either order):
+# - Bob -> Carol (Bob is son of Alice, Carol's mother)
+# - Carol -> Bob (Carol is daughter of Alice, Bob's mother)
+# Note: Self-relationships (e.g., Bob -> Bob) would indicate an inference issue
+SELECT ?sibling1 ?sibling2 WHERE {
+  ?sibling1 :siblingOf ?sibling2 .
+}
+ORDER BY ?sibling1 ?sibling2
+
+##
+## 0.2 core gender-specific family relationships
+##
+
+###
+### 0.2.1 Test mother relationships (generic is parentOf, inferred)
+# Expected results:
+# - Alice -> Bob (Alice is mother of Bob)
+# - Alice -> Carol (Alice is mother of Carol)
+# - Carol -> Eva (Carol is mother of Eva)
+SELECT ?mother ?child WHERE {
+  ?mother :motherOf ?child .
+}
+ORDER BY ?mother ?child
+
+###
+### 0.2.2 Test father relationships (generic is parentOf, inferred)
+# Expected results:
+# - Bob -> David (Bob is father of David)
+SELECT ?father ?child WHERE {
+  ?father :fatherOf ?child .
+}
+ORDER BY ?father ?child
+
+###
+### 0.2.3 Test daughter relationships (generic is childOf, inferred)
+# Expected results:
+# - Carol -> Alice (Carol is daughter of Alice)
+# - Eva -> Carol (Eva is daughter of Carol)
+SELECT ?daughter ?parent WHERE {
+  ?daughter :daughterOf ?parent .
+}
+ORDER BY ?daughter ?parent
+
+###
+### 0.2.4 Test son relationships (generic is childOf, inferred)
+# Expected results:
+# - Bob -> Alice (Bob is son of Alice)
+# - David -> Bob (David is son of Bob)
+SELECT ?son ?parent WHERE {
+  ?son :sonOf ?parent .
+}
+ORDER BY ?son ?parent
+
+###
+### 0.2.5 Test sister relationships (generic is siblingOf, inferred)
+# Expected results:
+# - Carol -> Bob (Carol is sister of Bob)
+SELECT ?sister ?sibling WHERE {
+  ?sister :sisterOf ?sibling .
+}
+ORDER BY ?sister ?sibling
+
+###
+### 0.2.6 Test brother relationships (generic is siblingOf, inferred)
+# Expected results:
+# - Bob -> Carol (Bob is brother of Carol)
+SELECT ?brother ?sibling WHERE {
+  ?brother :brotherOf ?sibling .
+}
+ORDER BY ?brother ?sibling
+
+#----------------------------------#
+# 1. extended family relationships #
+#----------------------------------#
+
+##
+## 1.1 extended gender-neutral family relationships
+##
+
+###
+### 1.1.1 Test grandparent relationships (inferred, inverse of grandchild)
+# Expected results:
+# - Alice -> David (Alice is mother of Bob, David's father)
+# - Alice -> Eva (Alice is mother of Carol, Eva's mother)
+SELECT ?grandparent ?grandchild WHERE {
+  ?grandparent :grandparentOf ?grandchild .
+}
+ORDER BY ?grandparent ?grandchild
+
+###
+### 1.1.2 Test grandchild relationships (inferred, inverse of grandparent)
+# Expected results:
+# - David -> Alice (David is son of Bob, Alice's mother)
+# - Eva -> Alice (Eva is son of Carol, Alice's mother)
+SELECT ?grandchild ?grandparent WHERE {
+  ?grandchild :grandchildOf ?grandparent .
+}
+ORDER BY ?grandchild ?grandparent
+
+###
+### 1.1.3 Test parent-in-law relationships (inferred, inverse of child-in-law)
+# Expected results:
+# - Alice -> Carl (Alice is mother of Carol, Carl' husband)
+SELECT ?parentInLaw ?childInLaw WHERE {
+  ?parentInLaw :parentInLawOf ?childInLaw .
+}
+ORDER BY ?parentInLaw ?childInLaw
+
+###
+### 1.1.4 Test child-in-law relationships (inferred, inverse of parent-in-law)
+# Expected results:
+# - Carl -> Alice (Carl is husband of Carol, Alice's daughter)
+SELECT ?childInLaw ?parentInLaw WHERE {
+  ?childInLaw :childInLawOf ?parentInLaw .
+}
+ORDER BY ?childInLaw ?parentInLaw
+
+###
+### 1.1.5 Test sibling-in-law relationships (inferred, symmetric)
+# Expected results:
+# - Carl -> Bob (Carl is husband of Carol, Bob's brother)
+# - Bob -> Carl (Bob is brother of Carol, Carl's husband)
+SELECT ?siblingInLaw1 ?siblingInLaw2 WHERE {
+  ?siblingInLaw1 :siblingInLawOf ?siblingInLaw2 .
+}
+ORDER BY ?siblingInLaw1 ?siblingInLaw2
+
+###
+### 1.1.6 Test uncle/aunt relationships (inferred, inverse of nephew/niece)
+# Expected results:
+# - Bob -> Eva  (Bob is brother of Carol, Evas's mother)
+# - Carol -> David (Carol is sister of Bob, Davids's father)
+# - Carl -> David (Carl is brother-in-law of David, David's father)
+SELECT ?uncleAunt ?nephewNiece WHERE {
+  ?uncleAunt :uncleAuntOf ?nephewNiece .
+}
+ORDER BY ?uncleAunt ?nephewNiece
+
+###
+### 1.1.7 Test nephew/niece relationships (inferred, inverse of uncle/aunt)
+# Expected results:
+# - Eva -> Bob (Eva is daughter of Carol, Bob's sister)
+# - David -> Carol (David is son of Bob, Carol's brother)
+# - David -> Carl (David is son of Bob, Carl's brother-in-law)
+SELECT ?nibling ?uncleAunt WHERE {
+  ?nibling :niblingOf ?uncleAunt .
+}
+ORDER BY ?nibling ?uncleAunt
+
+###
+### 1.1.8 Test cousin relationships (inferred, symmetric)
+# Expected results (2 rows in either order):
+# - David -> Eva (David is son of Bob, brother of Carol, Eva's mother)
+# - Eva -> David (Eva is daughter of Carol, sister of Bob, David's father)
+SELECT ?cousin1 ?cousin2 WHERE {
+  ?cousin1 :cousinOf ?cousin2 .
+}
+ORDER BY ?cousin1 ?cousin2
+
+###
+### 1.1.9 Test great-grandparent relationships (inferred, inverse of great-grandchild)
+
+###
+### 1.1.10 Test great-grandchild relationships (inferred, inverse of great-grandparent)
+
+##
+## 1.2 extended gender-specific family relationships
+##
+
+###
+### 1.2.1 Test grandmother relationships (generic is grandparentOf, inferred)
+# Expected results:
+# - Alice -> Eva (Alice is mother of Carol, Eva's mother)
+# - Alice -> David (Alice is mother of Bob, David's father)
+SELECT ?grandmother ?grandchild WHERE {
+  ?grandmother :grandmotherOf ?grandchild .
+}
+ORDER BY ?grandmother ?grandchild
+
+###
+### 1.2.2 Test grandfather relationships (generic is grandparentOf, inferred)
+
+###
+### 1.2.3 Test granddaughter relationships (generic is grandchildOf, inferred)
+# Expected results:
+# - Eva -> Alice (Eva is daughter of Carol, Alice's daughter)
+SELECT ?granddaughter ?grandparent WHERE {
+  ?granddaughter :granddaughterOf ?grandparent .
+}
+ORDER BY ?granddaughter ?grandparent
+
+###
+### 1.2.4 Test grandson relationships (generic is grandchildOf, inferred)
+# Expected results:
+# - David -> Alice (David is son of Bob, Alice's son)
+SELECT ?grandson ?grandparent WHERE {
+  ?grandson :grandsonOf ?grandparent .
+}
+ORDER BY ?grandson ?grandparent
+
+###
+### 1.2.5 Test motherInLaw relationships (generic is parentInLawOf, inferred)
+# Expected results:
+# - Alice -> Carl (Alice is mother of Carol, Carl's wife)
+SELECT ?motherInLaw ?childInLaw WHERE {
+  ?motherInLaw :motherInLawOf ?childInLaw .
+}
+ORDER BY ?motherInLaw ?childInLaw
+
+###
+### 1.2.6 Test fatherInLaw relationships (generic is parentInLawOf, inferred)
+
+###
+### 1.2.7 Test daughterInLaw relationships (generic is childInLawOf, inferred)
+
+###
+### 1.2.8 Test sonInLaw relationships (generic is childInLawOf, inferred)
+# Expected results:
+# - Carl -> Alice (Carl is husband of Carol, Alice's daughter)
+SELECT ?sonInLaw ?parentInLaw WHERE {
+  ?sonInLaw :sonInLawOf ?parentInLaw .
+}
+ORDER BY ?sonInLaw ?parentInLaw
+
+###
+### 1.2.9 Test sisterInLaw relationships (generic is siblingInLawOf, inferred)
+
+###
+### 1.2.10 Test brotherInLaw relationships (generic is siblingInLawOf, inferred)
+# Expected results:
+# - Bob -> Carl (Bob is brother of Carol, Carl's wife)
+# - Carl -> Bob (Carl is husband of Carol, Bob's sister)
+SELECT ?brotherInLaw1 ?brotherInLaw2 WHERE {
+  ?brotherInLaw1 :brotherInLawOf ?brotherInLaw2 .
+}
+ORDER BY ?brotherInLaw1 ?brotherInLaw2
+
+###
+### 1.2.11 Test aunt relationships (generic is uncleAuntOf, inferred)
+# Expected results:
+# - Carol -> David (Carol is sister of Bob, David's father)
+SELECT ?aunt ?nephewNiece WHERE {
+  ?aunt :auntOf ?nephewNiece .
+}
+ORDER BY ?aunt ?nephewNiece
+
+###
+### 1.2.12 Test uncle relationships (generic is uncleAuntOf, inferred)
+# Expected results:
+# - Bob -> Eva (Bob is brother of Carol, Eva's mother)
+# - Carl -> David (Carl is brother-in-law of Bob, David's father)
+SELECT ?uncle ?nephewNiece WHERE {
+  ?uncle :uncleOf ?nephewNiece .
+}
+ORDER BY ?uncle ?nephewNiece
+
+###
+### 1.2.13 Test niece relationships (generic is niblingOf, inferred)
+# Expected results:
+# - Eva -> Bob (Eva is daughter of Carol, Bob's sister)
+SELECT ?niece ?auntOrUncle WHERE {
+  ?niece :nieceOf ?auntOrUncle .
+}
+ORDER BY ?niece ?auntOrUncle
+
+###
+### 1.2.14 Test nephew relationships (generic is niblingOf, inferred)
+# Expected results:
+# - David -> Carol (David is son of Bob, Carol's brother)
+# - David -> Carl (David is son of Bob, Carl's brother-in-law)
+SELECT ?nephew ?auntOrUncle WHERE {
+  ?nephew :nephewOf ?auntOrUncle .
+}
+ORDER BY ?nephew ?auntOrUncle
+
+###
+### 1.2.15 Test cousin female relationships (generic is cousinOf, inferred)
+# Expected results:
+# - Eva -> David (Eva is daughter of Carol, sister of Bob, David's father)
+SELECT ?femaleCousin ?cousin WHERE {
+  ?femaleCousiln :femaleCousinOf ?cousin .
+  FILTER NOT EXISTS { ?femaleCousin :maleCousinOf ?any }  # Ensure we only get female cousins
+}
+ORDER BY ?femaleCousin ?cousin
+
+###
+### 1.2.16 Test cousin male relationships (generic is cousinOf, inferred)
+# Expected results:
+# - David -> Eva (David is son of Bob, sister of Carol, Eva's mother)
+SELECT ?maleCousin ?cousin WHERE {
+  ?maleCousin :maleCousinOf ?cousin .
+  FILTER NOT EXISTS { ?maleCousin :femaleCousinOf ?any }  # Ensure we only get male cousins
+}
+ORDER BY ?maleCousin ?cousin
+
+### 1.2.17 Test great-grandmother relationships (generic is greatGrandparentOf, inferred)
+###
+### 1.2.18 Test great-grandfather relationships (generic is greatGrandparentOf, inferred)
+###
+### 1.2.19 Test great-granddaughter relationships (generic is greatGrandchildOf, inferred)
+###
+### 1.2.20 Test great-grandson relationships (generic is greatGrandchildOf, inferred)
+
+#---------------------------------#
+# 2. blended family relationships #
+#---------------------------------#
+
+##
+## 2.1 blended gender-neutral family relationships
+##
+
+###
+### 2.1.1 Test step parent relationships (inferred, inverse of step child)
+###
+### 2.1.2 Test step child relationships (inferred, inverse of step parent)
+###
+### 2.1.3 Test step sibling relationships (inferred, reflexive)
+###
+### 2.1.3 Test half sibling relationships (inferred, reflexive)
+
+
+##
+## 2.1 blended gender-specific family relationships
+##
+
+###
+### 2.2.1 Test step mother relationships (generic is stepMotherOf, inferred)
+###
+### 2.2.2 Test step father relationships (generic is stepFatherOf, inferred)
+###
+### 2.2.3 Test step daughter relationships (generic is stepDaughterOf, inferred)
+###
+### 2.2.4 Test step son relationships (generic is stepSonOf, inferred)
+###
+### 2.2.5 Test step sister relationships (generic is stepSisterOf, inferred)
+###
+### 2.2.6 Test step brother relationships (generic is stepBrotherOf, inferred)
+###
+### 2.2.7 Test half sister relationships (generic is halfSisterOf, inferred)
+###
+### 2.2.8 Test half brother relationships (generic is halfBrotherOf, inferred)
+
+#------------------------------------#
+# 3. additional family relationships #
+#------------------------------------#
+
+###
+### 3.1 Test twin relationships (explicit in data, symmetric)
+# Expected results:
+# - Bob -> Carol (Bob is twin of Carol)
+# - Carol -> Bob (Carol is twin of Bob)
+SELECT ?twin1 ?twin2 WHERE {
+  ?twin1 :twinOf ?twin2 .
+}
+ORDER BY ?twin1 ?twin2

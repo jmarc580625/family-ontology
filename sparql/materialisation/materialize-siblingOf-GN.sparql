@@ -1,0 +1,17 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred sibling relationships
+# Two people are siblings if they share at least one parent
+# This includes both full siblings (two parents) and half-siblings (one parent)
+# Note: halfSiblingOf is a subproperty that further refines this relationship
+
+INSERT {
+    ?person1 :siblingOf ?person2 .
+#    ?person2 :siblingOf ?person1 . # uncomment if symmetric property is not properly inferred
+}
+WHERE {
+    ?parent :parentOf ?person1 .
+    ?parent :parentOf ?person2 .
+    FILTER(?person1 != ?person2)  # Prevent self-relationships
+#    FILTER NOT EXISTS { ?person1 :siblingOf ?person2 }  # uncomment for idempotency (incremental updates)
+}

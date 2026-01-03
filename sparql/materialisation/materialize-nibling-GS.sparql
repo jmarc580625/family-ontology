@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Materialize gender-specific nibling relationships
+# Creates :nieceOf and :nephewOf from :niblingOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?nibling :nieceOf ?uncleAunt .
+}
+WHERE {
+    ?nibling :niblingOf ?uncleAunt .
+    ?nibling a :FemalePerson .
+#    FILTER NOT EXISTS { ?nibling :nieceOf ?uncleAunt }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?nibling :nephewOf ?uncleAunt .
+}
+WHERE {
+    ?nibling :niblingOf ?uncleAunt .
+    ?nibling a :MalePerson .
+#    FILTER NOT EXISTS { ?nibling :nephewOf ?uncleAunt }  # uncomment for idempotency (incremental updates)
+}

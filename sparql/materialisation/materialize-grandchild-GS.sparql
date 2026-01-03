@@ -1,0 +1,22 @@
+PREFIX : <http://example.org/family#>
+
+# Materialize gender-specific grandchild relationships
+# Creates :granddaughterOf and :grandsonOf from :grandchildOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?grandchild :granddaughterOf ?grandparent .
+}
+WHERE {
+    ?grandchild :grandchildOf ?grandparent .
+    ?grandchild a :FemalePerson .
+#    FILTER NOT EXISTS { ?grandchild :granddaughterOf ?grandparent }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?grandchild :grandsonOf ?grandparent .
+}
+WHERE {
+    ?grandchild :grandchildOf ?grandparent .
+    ?grandchild a :MalePerson .
+#    FILTER NOT EXISTS { ?grandchild :grandsonOf ?grandparent }  # uncomment for idempotency (incremental updates)
+}

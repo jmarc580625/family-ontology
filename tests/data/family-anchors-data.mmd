@@ -1,0 +1,24 @@
+graph TD
+  %% Individuals
+
+  hercule[👨 Hercule]
+  athena[👩 Athena]
+
+
+  %% adam, eva, azura, abel are defined in family-sample-data.ttl
+
+  %% relations
+
+  subgraph "Family-anchored, gender-neutral, given relationships"
+    %% Generation 1
+    hercule-->|closeFriendOf|adam
+    hercule-->|closeFriendOf|eva
+    hercule-->|witnessOf|adam
+    hercule-->|godParentOf|abel
+
+    athena-->|closeFriendOf|adam
+    athena-->|closeFriendOf|eva
+    athena-->|witnessOf|eva
+    athena-->|godParentOf|azura
+  end
+  

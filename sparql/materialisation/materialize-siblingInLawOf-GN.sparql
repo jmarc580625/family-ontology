@@ -1,0 +1,27 @@
+PREFIX : <http://example.org/family#>
+
+# Materialize sibling-in-law relationships
+# Path 1: spouse's sibling
+# Path 2: sibling's spouse (handled by symmetry)
+# Path 3: spouse of sibling's spouse (co-sibling-in-law)
+
+INSERT {
+    ?person :siblingInLawOf ?siblingInLaw .
+    ?siblingInLaw :siblingInLawOf ?person .  # Explicit symmetry since OWL reasoning doesn't reapply
+}
+WHERE {
+    {
+        # Path 1: spouse's sibling
+        ?spouse :spouseOf ?person .
+        ?spouse :siblingOf ?siblingInLaw .
+    }
+    UNION
+    {
+        # Path 3: spouse of sibling's spouse (co-sibling-in-law)
+        ?person :spouseOf ?mySpouse .
+        ?mySpouse :siblingOf ?sibling .
+        ?sibling :spouseOf ?siblingInLaw .
+        FILTER(?person != ?siblingInLaw)  # Ensure not self
+    }
+#    FILTER NOT EXISTS { ?person :siblingInLawOf ?siblingInLaw }  # uncomment for idempotency (incremental updates)
+}

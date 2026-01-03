@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Materialize gender-specific parent-in-law relationships
+# Creates :motherInLawOf and :fatherInLawOf from :parentInLawOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?parentInLaw :motherInLawOf ?childInLaw .
+}
+WHERE {
+    ?parentInLaw :parentInLawOf ?childInLaw .
+    ?parentInLaw a :FemalePerson .
+#    FILTER NOT EXISTS { ?parentInLaw :motherInLawOf ?childInLaw }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?parentInLaw :fatherInLawOf ?childInLaw .
+}
+WHERE {
+    ?parentInLaw :parentInLawOf ?childInLaw .
+    ?parentInLaw a :MalePerson .
+#    FILTER NOT EXISTS { ?parentInLaw :fatherInLawOf ?childInLaw }  # uncomment for idempotency (incremental updates)
+}

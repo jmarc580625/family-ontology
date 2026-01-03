@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Insert gender-specific half sibling relationships
+# halfSisterOf: female half sibling
+# halfBrotherOf: male half sibling
+
+INSERT {
+  ?halfSib :halfSisterOf ?person .
+}
+WHERE {
+  ?halfSib :halfSiblingOf ?person .
+  ?halfSib a :FemalePerson .
+}
+;
+
+INSERT {
+  ?halfSib :halfBrotherOf ?person .
+}
+WHERE {
+  ?halfSib :halfSiblingOf ?person .
+  ?halfSib a :MalePerson .
+}

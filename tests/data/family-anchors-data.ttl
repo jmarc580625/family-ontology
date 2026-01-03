@@ -1,0 +1,18 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix : <http://example.org/family#> .
+
+### INDIVIDUALS ###
+:hercule a :MalePerson .
+:athena a :FemalePerson .
+
+### RELATIONS ###
+:hercule :closeFriendOf :adam .
+:hercule :closeFriendOf :eva .
+:hercule :witnessOf :adam .   # Hercule is Adam's witness (at Adam's marriage to Eva)
+:hercule :godParentOf :abel .
+
+:athena :closeFriendOf :adam .
+:athena :closeFriendOf :eva .
+:athena :witnessOf :eva .     # Athena is Eva's witness (at the same marriage)
+:athena :godParentOf :azura .
+

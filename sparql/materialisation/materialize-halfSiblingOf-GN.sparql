@@ -1,0 +1,28 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred half-sibling relationships
+# Two people are half-siblings if:
+# - They share exactly one parent (not two)
+# - They are not twins (twins are full siblings even with one known parent)
+
+INSERT {
+  ?x :halfSiblingOf ?y .
+}
+WHERE {
+  # They share one parent
+  ?p1 :parentOf ?x .
+  ?p1 :parentOf ?y .
+  FILTER (?x != ?y)
+  
+  # But they don't share a second distinct parent
+  FILTER NOT EXISTS {
+    ?p2 :parentOf ?x .
+    ?p2 :parentOf ?y .
+    FILTER (?p1 != ?p2)
+  }
+  
+  # Exclude twins (they are full siblings, not half-siblings)
+  FILTER NOT EXISTS {
+    ?x :twinOf ?y .
+  }
+}

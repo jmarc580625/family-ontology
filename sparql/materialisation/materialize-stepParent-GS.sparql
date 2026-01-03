@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Insert gender-specific step parent relationships
+# stepMotherOf: female step parent
+# stepFatherOf: male step parent
+
+INSERT {
+  ?stepParent :stepMotherOf ?stepChild .
+}
+WHERE {
+  ?stepParent :stepParentOf ?stepChild .
+  ?stepParent a :FemalePerson .
+}
+;
+
+INSERT {
+  ?stepParent :stepFatherOf ?stepChild .
+}
+WHERE {
+  ?stepParent :stepParentOf ?stepChild .
+  ?stepParent a :MalePerson .
+}

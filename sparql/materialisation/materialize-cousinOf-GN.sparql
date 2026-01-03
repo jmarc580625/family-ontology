@@ -1,0 +1,14 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred cousin relationships (inclusive definition)
+# A person is a cousin of their uncle/aunt's children
+# This includes children of uncles/aunts by marriage (social/family bonds)
+INSERT {
+    ?person1 :cousinOf ?person2 .
+    ?person2 :cousinOf ?person1 .  # Explicit symmetry (OWL reasoning doesn't reapply after materialization)
+}
+WHERE {
+    ?uncleAunt :uncleAuntOf ?person1 .
+    ?uncleAunt :parentOf ?person2 .
+#    FILTER NOT EXISTS { ?person1 :cousinOf ?person2 }  # uncomment for idempotency (incremental updates)
+}

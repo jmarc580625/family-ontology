@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Materialize gender-specific sibling-in-law relationships
+# Creates :sisterInLawOf and :brotherInLawOf from :siblingInLawOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?siblingInLaw :sisterInLawOf ?otherSiblingInLaw .
+}
+WHERE {
+    ?siblingInLaw :siblingInLawOf ?otherSiblingInLaw .
+    ?siblingInLaw a :FemalePerson .
+#    FILTER NOT EXISTS { ?siblingInLaw :sisterInLawOf ?otherSiblingInLaw }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?siblingInLaw :brotherInLawOf ?otherSiblingInLaw .
+}
+WHERE {
+    ?siblingInLaw :siblingInLawOf ?otherSiblingInLaw .
+    ?siblingInLaw a :MalePerson .
+#    FILTER NOT EXISTS { ?siblingInLaw :brotherInLawOf ?otherSiblingInLaw }  # uncomment for idempotency (incremental updates)
+}

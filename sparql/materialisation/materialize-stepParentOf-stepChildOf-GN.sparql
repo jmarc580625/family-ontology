@@ -1,0 +1,20 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred step parent relationships
+# A person is a step parent of another person if:
+# - they are married to the child's biological parent
+# - but they are not the child's biological parent themselves
+
+INSERT {
+  ?stepParent :stepParentOf ?stepChild .
+  ?stepChild :stepChildOf ?stepParent .
+}
+WHERE {
+  ?bioParent :parentOf ?stepChild .
+  ?bioParent :spouseOf ?stepParent .
+  
+  # Ensure stepParent is NOT a biological parent of stepChild
+  FILTER NOT EXISTS {
+    ?stepParent :parentOf ?stepChild .
+  }
+}

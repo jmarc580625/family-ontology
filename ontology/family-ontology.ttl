@@ -1,0 +1,698 @@
+@prefix : <http://example.org/family#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rel: <http://purl.org/vocab/relationship/> .
+
+#---------------------------
+# Ontology Declaration
+#---------------------------
+
+<http://example.org/family> a owl:Ontology ;
+    owl:versionIRI <http://example.org/family/1.0.0> ;
+    owl:versionInfo "1.0.0" ;
+    rdfs:label "Family Relationship Ontology"@en ;
+    rdfs:comment """A comprehensive ontology for modeling complex family relationships 
+        including biological, adoptive, blended, and in-law relationships. 
+        Designed for OWL 2 RL reasoning with SPARQL-based materialization 
+        for relationships requiring irreflexive constraints."""@en ;
+    dc:creator "Family Ontology Project" ;
+    dc:date "2026-01-03"^^xsd:date ;
+    dcterms:license <https://opensource.org/licenses/MIT> ;
+    rdfs:seeAlso <https://vocab.org/relationship/> ,
+                 <http://xmlns.com/foaf/0.1/> .
+
+#---------------------------
+# Class Definitions
+#---------------------------
+
+## Person class (aligned with FOAF)
+:Person a owl:Class ;
+    owl:equivalentClass foaf:Person ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A person. Equivalent to foaf:Person."@en .
+
+## Gender classes
+:Male a owl:Class ;
+    rdfs:label "Male"@en ;
+    rdfs:comment "The male gender."@en .
+
+:Female a owl:Class ;
+    rdfs:label "Female"@en ;
+    rdfs:comment "The female gender."@en .
+
+## Gender-specific person classes
+:MalePerson a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Person :Male )
+    ] ;
+    rdfs:subClassOf :Person ;
+    rdfs:label "Male Person"@en ;
+    rdfs:comment "A person who is male."@en .
+
+:FemalePerson a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Person :Female )
+    ] ;
+    rdfs:subClassOf :Person ;
+    rdfs:label "Female Person"@en ;
+    rdfs:comment "A person who is female."@en .
+
+#---------------------------
+# Annotation Properties for Materialization Metadata
+#---------------------------
+
+:materializationDependency a owl:AnnotationProperty ;
+    rdfs:label "Materialization Dependency"@en ;
+    rdfs:comment "Documents properties that this relationship depends on for SPARQL materialization. Used when OWL property chains cannot express the relationship due to limitations like irreflexive constraints or UNION patterns."@en .
+
+:materializationScript a owl:AnnotationProperty ;
+    rdfs:label "Materialization Script"@en ;
+    rdfs:comment "Relative path to the SPARQL UPDATE script that materializes this relationship."@en .
+
+:materializationReason a owl:AnnotationProperty ;
+    rdfs:label "Materialization Reason"@en ;
+    rdfs:comment "Explains why this relationship requires SPARQL materialization instead of OWL property chains."@en .
+
+:materializationLevel a owl:AnnotationProperty ;
+    rdfs:label "Materialization Level"@en ;
+    rdfs:comment "The dependency level for materialization order. Level 0 = base properties, higher levels depend on lower levels being materialized first."@en .
+
+#---------------------------
+# 0. core family relationships
+
+## 0.1 core gender-neutral family relationships
+
+### 0.1.1 spouse : https://vocab.org/relationship/#spouseOf
+:spouseOf rdfs:subPropertyOf rel:spouseOf ;
+    rdfs:domain :Person ;
+    rdfs:range :Person ;
+    rdfs:comment "A person who is married to another person. This is a symmetric relationship."@en ;
+    rdf:type owl:SymmetricProperty .
+
+### 0.1.2 parent : https://vocab.org/relationship/#parentOf
+:parentOf rdfs:subPropertyOf rel:parentOf ;
+    rdfs:domain :Person ;
+    rdfs:range :Person ;
+    owl:inverseOf :childOf ;
+    rdfs:comment "A person who is the parent of another person. This includes biological and adoptive relationships. By convention, use :parentOf for typical (biological) relationships and :adoptiveParentOf when adoption is explicitly known."@en .
+
+### 0.1.3 child : https://vocab.org/relationship/#childOf
+:childOf rdfs:subPropertyOf rel:childOf ;
+    rdfs:domain :Person ;
+    rdfs:range :Person ;
+    owl:inverseOf :parentOf ;
+    rdfs:comment "A person who is the child of another person. This includes biological and adoptive relationships. By convention, use :childOf for typical (biological) relationships and :adoptiveChildOf when adoption is explicitly known."@en .
+
+### 0.1.4 adoptive parent
+:adoptiveParentOf rdfs:subPropertyOf :parentOf ;
+    owl:inverseOf :adoptiveChildOf ;
+    rdfs:comment "A person who is the adoptive parent of another person. This is a subproperty of :parentOf, so all family relationships (siblings, grandparents, uncles/aunts, etc.) are automatically inferred for adoptive relationships."@en .
+
+### 0.1.5 adoptive child
+:adoptiveChildOf rdfs:subPropertyOf :childOf ;
+    owl:inverseOf :adoptiveParentOf ;
+    rdfs:comment "A person who is the adoptive child of another person. This is a subproperty of :childOf."@en .
+
+### 0.1.6 sibling : https://vocab.org/relationship/#siblingOf
+:siblingOf rdfs:subPropertyOf rel:siblingOf ;
+    rdfs:domain :Person ;
+    rdfs:range :Person ;
+    rdfs:comment """A person who shares at least one parent with another person.
+        This relationship is symmetric and irreflexive."""@en ;
+    :materializationDependency :parentOf ;
+    :materializationScript "sparql/materialisation/materialize-siblingOf-GN.sparql" ;
+    :materializationReason "OWL property chains cannot express irreflexive constraint (person cannot be their own sibling)" ;
+    :materializationLevel 1 ;
+    rdf:type owl:SymmetricProperty, owl:IrreflexiveProperty .
+
+## 0.2 core gender-specific family relationships
+
+### 0.2.1 wife (female spouse)
+:wifeOf rdfs:subPropertyOf :spouseOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the spouse of another person."@en ;
+    :materializationDependency :spouseOf ;
+    :materializationScript "sparql/materialisation/materialize-spouse-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 0.2.2 husband (male spouse)
+:husbandOf rdfs:subPropertyOf :spouseOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the spouse of another person."@en ;
+    :materializationDependency :spouseOf ;
+    :materializationScript "sparql/materialisation/materialize-spouse-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 0.2.3 mother (female parent)
+:motherOf rdfs:subPropertyOf :parentOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the biological mother of another person."@en ;
+    :materializationDependency :parentOf ;
+    :materializationScript "sparql/materialisation/materialize-parent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 0.2.4 father (male parent)
+:fatherOf rdfs:subPropertyOf :parentOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the biological father of another person."@en ;
+    :materializationDependency :parentOf ;
+    :materializationScript "sparql/materialisation/materialize-parent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 0.2.5 daughter (female child)
+:daughterOf rdfs:subPropertyOf :childOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the biological daughter of another person."@en ;
+    :materializationDependency :childOf ;
+    :materializationScript "sparql/materialisation/materialize-child-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 0.2.6 son (male child)
+:sonOf rdfs:subPropertyOf :childOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the biological son of another person."@en ;
+    :materializationDependency :childOf ;
+    :materializationScript "sparql/materialisation/materialize-child-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 0.2.7 sister (female sibling)
+:sisterOf rdfs:subPropertyOf :siblingOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the sister of another person, meaning they share at least one parent."@en ;
+    :materializationDependency :siblingOf ;
+    :materializationScript "sparql/materialisation/materialize-sibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 0.2.8 brother (male sibling)
+:brotherOf rdfs:subPropertyOf :siblingOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the brother of another person, meaning they share at least one parent."@en ;
+    :materializationDependency :siblingOf ;
+    :materializationScript "sparql/materialisation/materialize-sibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+#-------------------------------
+# 1. extended family relationships
+
+## 1.1 extended gender-neutral family relationships ###
+
+### 1.1.1 grand-parent : https://vocab.org/relationship/#grandParentOf
+:grandparentOf rdfs:subPropertyOf rel:grandparentOf ;
+    rdfs:comment "A person who is the parent of one's parent. This is defined through a property chain of two :parentOf relationships."@en ;
+    owl:propertyChainAxiom (
+        :parentOf    # First find Parent
+        :parentOf    # Then find Parent's parent
+    ) .
+
+### 1.1.2 grand-child : https://vocab.org/relationship/#grandChildOf
+:grandchildOf rdfs:subPropertyOf rel:grandchildOf ;
+    rdfs:comment "A person who is the child of one's child. This is the inverse of :grandparentOf."@en ;
+    owl:inverseOf :grandparentOf .
+
+### 1.1.3 uncle/aunt
+:uncleAuntOf rdfs:subPropertyOf foaf:knows ;
+    rdfs:comment """A person who is the sibling of one's parent (aunt or uncle), 
+        or the spouse of a parent's sibling (aunt/uncle by marriage). 
+        This is the inverse of :niblingOf."""@en ;
+    owl:inverseOf :niblingOf ;
+    :materializationDependency :parentOf, :siblingOf, :spouseOf ;
+    :materializationScript "sparql/materialisation/materialize-uncleAuntOf-niblingOf-GN.sparql" ;
+    :materializationReason "Requires UNION of blood siblings and their spouses, not expressible in OWL property chains" ;
+    :materializationLevel 2 .
+
+### 1.1.4 nibling (niece/nephew)
+:niblingOf rdfs:subPropertyOf foaf:knows ;
+    rdfs:comment """A person who is the child of one's sibling (niece or nephew),
+        or the child of one's sibling's spouse.
+        This is the inverse of :uncleAuntOf."""@en ;
+    owl:inverseOf :uncleAuntOf ;
+    :materializationDependency :siblingOf, :childOf ;
+    :materializationScript "sparql/materialisation/materialize-uncleAuntOf-niblingOf-GN.sparql" ;
+    :materializationReason "Inverse of uncleAuntOf, materialized in same script" ;
+    :materializationLevel 2 .
+
+### 1.1.5 cousin
+:cousinOf rdfs:subPropertyOf foaf:knows ;
+    rdfs:comment """A person who is the child of one's aunt or uncle.
+        This relationship is symmetric and irreflexive."""@en ;
+    :materializationDependency :uncleAuntOf, :childOf ;
+    :materializationScript "sparql/materialisation/materialize-cousinOf-GN.sparql" ;
+    :materializationReason "OWL property chains cannot express irreflexive constraint" ;
+    :materializationLevel 3 ;
+    rdf:type owl:SymmetricProperty, owl:IrreflexiveProperty .
+
+### 1.1.6 great-grandparent
+:greatGrandparentOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "A person who is the grandparent of one's parent. This is defined through a property chain of three :childOf relationships."@en ;
+    owl:propertyChainAxiom (
+        :grandparentOf    # First find Grandparent
+        :parentOf         # Then find Grandparent's parent
+    ) .
+
+### 1.1.7 great-grandchild
+:greatGrandchildOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "A person who is the grandchild of one's child. This is defined through a property chain of three :parentOf relationships."@en ;
+    owl:inverseOf :greatGrandparentOf .
+
+## 1.2 extended gender-specific family relationships
+
+### 1.2.1 grandmother (female grandparent)
+:grandmotherOf rdfs:subPropertyOf :grandparentOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the mother of one's parent."@en ;
+    :materializationDependency :grandparentOf ;
+    :materializationScript "sparql/materialisation/materialize-grandparent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 1.2.2 grandfather (male grandparent)
+:grandfatherOf rdfs:subPropertyOf :grandparentOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the father of one's parent."@en ;
+    :materializationDependency :grandparentOf ;
+    :materializationScript "sparql/materialisation/materialize-grandparent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 1.2.3 granddaughter (female grandchild)
+:granddaughterOf rdfs:subPropertyOf :grandchildOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the daughter of one's child."@en ;
+    :materializationDependency :grandchildOf ;
+    :materializationScript "sparql/materialisation/materialize-grandchild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 1.2.4 grandson (male grandchild)
+:grandsonOf rdfs:subPropertyOf :grandchildOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the son of one's child."@en ;
+    :materializationDependency :grandchildOf ;
+    :materializationScript "sparql/materialisation/materialize-grandchild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 1.2.5 aunt (female uncle/aunt)
+:auntOf rdfs:subPropertyOf :uncleAuntOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the sister of one's parent."@en ;
+    :materializationDependency :uncleAuntOf ;
+    :materializationScript "sparql/materialisation/materialize-uncleAunt-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.6 uncle (male uncle/aunt)
+:uncleOf rdfs:subPropertyOf :uncleAuntOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the brother of one's parent."@en ;
+    :materializationDependency :uncleAuntOf ;
+    :materializationScript "sparql/materialisation/materialize-uncleAunt-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.7 niece (female nibling)
+:nieceOf rdfs:subPropertyOf :niblingOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the daughter of one's sibling."@en ;
+    :materializationDependency :niblingOf ;
+    :materializationScript "sparql/materialisation/materialize-nibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.8 nephew (male nibling)
+:nephewOf rdfs:subPropertyOf :niblingOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the son of one's sibling."@en ;
+    :materializationDependency :niblingOf ;
+    :materializationScript "sparql/materialisation/materialize-nibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.9 cousin female
+:cousinFemaleOf rdfs:subPropertyOf :cousinOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the child of one's aunt or uncle."@en ;
+    :materializationDependency :cousinOf ;
+    :materializationScript "sparql/materialisation/materialize-cousin-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 4 .
+
+### 1.2.10 cousin male
+:cousinMaleOf rdfs:subPropertyOf :cousinOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the child of one's aunt or uncle."@en ;
+    :materializationDependency :cousinOf ;
+    :materializationScript "sparql/materialisation/materialize-cousin-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 4 .
+
+### 1.2.11 great-grandmother (female great-grandparent)
+:greatGrandmotherOf rdfs:subPropertyOf :greatGrandparentOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the grandmother of one's parent."@en ;
+    :materializationDependency :greatGrandparentOf ;
+    :materializationScript "sparql/materialisation/materialize-greatGrandparent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.12 great-grandfather (male great-grandparent)
+:greatGrandfatherOf rdfs:subPropertyOf :greatGrandparentOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the grandfather of one's parent."@en ;
+    :materializationDependency :greatGrandparentOf ;
+    :materializationScript "sparql/materialisation/materialize-greatGrandparent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.13 great-granddaughter (female great-grandchild)
+:greatGranddaughterOf rdfs:subPropertyOf :greatGrandchildOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the granddaughter of one's child."@en ;
+    :materializationDependency :greatGrandchildOf ;
+    :materializationScript "sparql/materialisation/materialize-greatGrandchild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 1.2.14 great-grandson (male great-grandchild)
+:greatGrandsonOf rdfs:subPropertyOf :greatGrandchildOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the grandson of one's child."@en ;
+    :materializationDependency :greatGrandchildOf ;
+    :materializationScript "sparql/materialisation/materialize-greatGrandchild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+#-------------------------------
+# 2. In-law family relationships 
+
+## 2.1 gender-neutral in-law family relationships
+
+### 2.1.1 parent-in-law (spouse's parent)
+:parentInLawOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "A person who is the parent of one's spouse. This relationship is defined through a property chain of :spouseOf and :childOf."@en ;
+    owl:inverseOf :childInLawOf ;
+    owl:propertyChainAxiom (
+        :parentOf   # First find child
+        :spouseOf   # Then find spouse's child
+    ) .
+
+### 2.1.2 child-in-law (children's spouse)
+:childInLawOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "A person who is married to one's child. This is the inverse of :parentInLawOf."@en ;
+    owl:inverseOf :parentInLawOf .
+
+### 2.1.3 sibling-in-law (spouse's siblings and co-siblings-in-law)
+:siblingInLawOf rdfs:subPropertyOf foaf:knows ;
+    rdfs:comment "A person who is the sibling of one's spouse, or the spouse of one's sibling, or the spouse of one's sibling's spouse (co-sibling-in-law). This is a symmetric and irreflexive relationship."@en ;
+    :materializationDependency :spouseOf, :siblingOf ;
+    :materializationScript "sparql/materialisation/materialize-siblingInLawOf-GN.sparql" ;
+    :materializationReason "Depends on siblingOf which is itself materialized; also requires UNION pattern" ;
+    :materializationLevel 2 ;
+    rdf:type owl:SymmetricProperty, owl:IrreflexiveProperty .
+
+## 2.2 gender-specific in-law family relationships
+
+### 2.2.1 mother-in-law (female parent-in-law)
+:motherInLawOf rdfs:subPropertyOf :parentInLawOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the parent of one's spouse."@en ;
+    :materializationDependency :parentInLawOf ;
+    :materializationScript "sparql/materialisation/materialize-parentInLaw-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 2.2.2 father-in-law (male parent-in-law)
+:fatherInLawOf rdfs:subPropertyOf :parentInLawOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the parent of one's spouse."@en ;
+    :materializationDependency :parentInLawOf ;
+    :materializationScript "sparql/materialisation/materialize-parentInLaw-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 2.2.3 daughter-in-law (female child-in-law)
+:daughterInLawOf rdfs:subPropertyOf :childInLawOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the child of one's spouse."@en ;
+    :materializationDependency :childInLawOf ;
+    :materializationScript "sparql/materialisation/materialize-childInLaw-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 2.2.4 son-in-law (male child-in-law)
+:sonInLawOf rdfs:subPropertyOf :childInLawOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the child of one's spouse."@en ;
+    :materializationDependency :childInLawOf ;
+    :materializationScript "sparql/materialisation/materialize-childInLaw-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 2.2.5 sister-in-law (female sibling-in-law)
+:sisterInLawOf rdfs:subPropertyOf :siblingInLawOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the sibling of one's spouse."@en ;
+    :materializationDependency :siblingInLawOf ;
+    :materializationScript "sparql/materialisation/materialize-siblingInLaw-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 2.2.6 brother-in-law (male sibling-in-law)
+:brotherInLawOf rdfs:subPropertyOf :siblingInLawOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the sibling of one's spouse."@en ;
+    :materializationDependency :siblingInLawOf ;
+    :materializationScript "sparql/materialisation/materialize-siblingInLaw-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+#------------------------------
+# 3. Blended family relationships 
+
+## 3.1 gender-neutral blended family relationships
+
+### 3.1.1 step parent
+:stepParentOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "Indicates a parent of one's spouse from a previous relationship"@en ;
+    owl:inverseOf :stepChildOf ;
+    owl:propertyDisjointWith :parentOf ;
+    :materializationDependency :spouseOf, :parentOf ;
+    :materializationScript "sparql/materialisation/materialize-stepParentOf-stepChildOf-GN.sparql" ;
+    :materializationReason "Requires identifying spouse's children from previous relationships" ;
+    :materializationLevel 1 .
+
+### 3.1.2 step child
+:stepChildOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "Indicates a child of one's spouse from a previous relationship"@en ;
+    owl:inverseOf :stepParentOf ;
+    :materializationDependency :spouseOf, :childOf ;
+    :materializationScript "sparql/materialisation/materialize-stepParentOf-stepChildOf-GN.sparql" ;
+    :materializationReason "Inverse of stepParentOf, materialized in same script" ;
+    :materializationLevel 1 .
+
+### 3.1.3 step sibling
+:stepSiblingOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "Indicates siblings who do not share a biological parent"@en ;
+    rdf:type owl:SymmetricProperty, owl:IrreflexiveProperty ;
+    owl:propertyDisjointWith :siblingOf ;
+    :materializationDependency :stepParentOf, :stepChildOf ;
+    :materializationScript "sparql/materialisation/materialize-stepSiblingOf-GN.sparql" ;
+    :materializationReason "Requires step-parent/step-child relationships to be materialized first" ;
+    :materializationLevel 2 .
+
+### 3.1.4 half sibling
+:halfSiblingOf rdfs:subPropertyOf :siblingOf ;
+    rdfs:comment "Indicates siblings who share only one parent"@en ;
+    rdf:type owl:SymmetricProperty, owl:IrreflexiveProperty ;
+    :materializationDependency :parentOf ;
+    :materializationScript "sparql/materialisation/materialize-halfSiblingOf-GN.sparql" ;
+    :materializationReason "Requires identifying siblings with exactly one shared parent" ;
+    :materializationLevel 1 .
+
+## 3.2 gender-specific blended family relationships
+
+### 3.2.1 step mother (female step parent)
+:stepMotherOf rdfs:subPropertyOf :stepParentOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the wife of one's parent but is not one's biological mother."@en ;
+    :materializationDependency :stepParentOf ;
+    :materializationScript "sparql/materialisation/materialize-stepParent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 3.2.2 step father (male step parent)
+:stepFatherOf rdfs:subPropertyOf :stepParentOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the husband of one's parent but is not one's biological father."@en ;
+    :materializationDependency :stepParentOf ;
+    :materializationScript "sparql/materialisation/materialize-stepParent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 3.2.3 step daughter (female step child)
+:stepDaughterOf rdfs:subPropertyOf :stepChildOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the daughter of one's spouse or partner but not one's biological child."@en ;
+    :materializationDependency :stepChildOf ;
+    :materializationScript "sparql/materialisation/materialize-stepChild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 3.2.4 step son (male step child)
+:stepSonOf rdfs:subPropertyOf :stepChildOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the son of one's spouse or partner but not one's biological child."@en ;
+    :materializationDependency :stepChildOf ;
+    :materializationScript "sparql/materialisation/materialize-stepChild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 3.2.5 step sister
+:stepSisterOf rdfs:subPropertyOf :stepSiblingOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who is the daughter of one's stepparent but not one's biological sibling."@en ;
+    :materializationDependency :stepSiblingOf ;
+    :materializationScript "sparql/materialisation/materialize-stepSibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 3.2.6 step brother (male step sibling)
+:stepBrotherOf rdfs:subPropertyOf :stepSiblingOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who is the son of one's stepparent but not one's biological sibling."@en ;
+    :materializationDependency :stepSiblingOf ;
+    :materializationScript "sparql/materialisation/materialize-stepSibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 3 .
+
+### 3.2.7 half sister (female half sibling)
+:halfSisterOf rdfs:subPropertyOf :halfSiblingOf ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "A female person who shares only one parent with another person."@en ;
+    :materializationDependency :halfSiblingOf ;
+    :materializationScript "sparql/materialisation/materialize-halfSibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+### 3.2.8 half brother (male half sibling)
+:halfBrotherOf rdfs:subPropertyOf :halfSiblingOf ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "A male person who shares only one parent with another person."@en ;
+    :materializationDependency :halfSiblingOf ;
+    :materializationScript "sparql/materialisation/materialize-halfSibling-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 2 .
+
+#---------------------------------
+# 4. Additional family relationships 
+
+## 4.1 twin relationship constraints
+
+### 4.1.1 twin
+:twinOf rdfs:subPropertyOf :siblingOf ;
+    rdfs:comment "A person who was born in the same pregnancy as another person. This is a symmetric and irreflexive relationship."@en ;
+    rdf:type owl:SymmetricProperty, owl:IrreflexiveProperty .
+
+#---------------------------------
+# 5. Property disjointness Axioms    
+
+## 5.1 Core family relationships
+### A person cannot be both parent and child of someone
+:siblingOf owl:propertyDisjointWith :parentOf, :childOf .
+:parentOf owl:propertyDisjointWith :childOf .
+
+## 5.2 In-law family relationships
+:parentInLawOf owl:propertyDisjointWith :parentOf .
+:childInLawOf owl:propertyDisjointWith :childOf .
+
+## 5.3 Step family relationships
+:parentOf owl:propertyDisjointWith :stepParentOf .
+:childOf owl:propertyDisjointWith :stepChildOf .
+:siblingOf owl:propertyDisjointWith :stepSiblingOf, :halfSiblingOf .
+
+#----------------------
+# 6.  family-anchored social relationships
+
+## 6.1 family-anchored gender-neutral social relationships
+
+### 6.1.1 godParentOf
+:godParentOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "Indicates a person who is known to be a godparent of another person."@en ;
+    owl:inverseOf :godChildOf .
+
+### 6.1.2 godChildOf
+:godChildOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "Indicates a person who is known to be a godchild of another person."@en .
+
+### 6.1.3 witnessOf
+:witnessOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:comment "Indicates a person who is known to be a marriage witness of another person."@en .
+
+## 6.2 family-anchored gender-specific social relationships
+
+### 6.2.1 godmotherOf (female godparent)
+:godmotherOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "Indicates a person who is known to be a godmother of another person."@en ;
+    owl:inverseOf :goddaughterOf ;
+    :materializationDependency :godParentOf ;
+    :materializationScript "sparql/materialisation/materialize-godparent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 6.2.2 godfatherOf (male godparent)
+:godfatherOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "Indicates a person who is known to be a godfather of another person."@en ;
+    owl:inverseOf :godsonOf ;
+    :materializationDependency :godParentOf ;
+    :materializationScript "sparql/materialisation/materialize-godparent-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 6.2.3 goddaughterOf (female godchild)
+:goddaughterOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:domain :FemalePerson ;
+    rdfs:comment "Indicates a person who is known to be a goddaughter of another person."@en ;
+    owl:inverseOf :godmotherOf ;
+    :materializationDependency :godChildOf ;
+    :materializationScript "sparql/materialisation/materialize-godchild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+### 6.2.4 godsonOf (male godchild)
+:godsonOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
+    rdfs:domain :MalePerson ;
+    rdfs:comment "Indicates a person who is known to be a godson of another person."@en ;
+    owl:inverseOf :godfatherOf ;
+    :materializationDependency :godChildOf ;
+    :materializationScript "sparql/materialisation/materialize-godchild-GS.sparql" ;
+    :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
+    :materializationLevel 1 .
+
+#----------------------
+# 7. core social relationships
+
+## 7.1 core gender-neutral social relationships
+
+### 7.1.1 friendOf : https://vocab.org/relationship/#friendOf
+:friendOf a owl:SymmetricProperty, owl:IrreflexiveProperty ;
+    rdfs:comment "Indicates a person who is known to be a friend of another person. This is a symmetric and irreflexive relationship."@en .
+
+### 7.1.2 closeFriendOf : https://vocab.org/relationship/#closeFriendOf
+:closeFriendOf rdfs:subPropertyOf :friendOf ;
+    rdfs:comment "Indicates a person who is known to be a close friend of another person. This is a subproperty of friendOf and is also symmetric and irreflexive."@en ;
+    a owl:SymmetricProperty, owl:IrreflexiveProperty .

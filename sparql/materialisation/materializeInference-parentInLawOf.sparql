@@ -1,0 +1,10 @@
+PREFIX : <http://example.org/family#>
+
+INSERT {
+    ?parent :parentInLawOf ?spouse .
+}
+WHERE {
+    ?person :spouseOf ?spouse .
+    ?parent :parentOf ?person .
+#    FILTER NOT EXISTS { ?parent :parentInLawOf ?spouse }  # uncomment for idempotency (incremental updates)
+}

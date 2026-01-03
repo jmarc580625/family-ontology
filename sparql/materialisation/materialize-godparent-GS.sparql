@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Materialize gender-specific godparent relationships
+# Creates :godmotherOf and :godfatherOf from :godParentOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?godparent :godmotherOf ?godchild .
+}
+WHERE {
+    ?godparent :godParentOf ?godchild .
+    ?godparent a :FemalePerson .
+#    FILTER NOT EXISTS { ?godparent :godmotherOf ?godchild }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?godparent :godfatherOf ?godchild .
+}
+WHERE {
+    ?godparent :godParentOf ?godchild .
+    ?godparent a :MalePerson .
+#    FILTER NOT EXISTS { ?godparent :godfatherOf ?godchild }  # uncomment for idempotency (incremental updates)
+}

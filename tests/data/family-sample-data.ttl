@@ -1,0 +1,60 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix : <http://example.org/family#> .
+
+# Individuals
+
+## Generation 1
+:adam a :MalePerson .
+:eva a :FemalePerson .
+
+## Generation 2
+:azura a :FemalePerson .
+:antoine a :MalePerson .
+:abel a :MalePerson .
+:ada a :FemalePerson .
+
+## Generation 3
+:fiona a :FemalePerson .
+:bob a :MalePerson .
+:carol a :FemalePerson .
+:carl a :MalePerson .
+:zela a :FemalePerson .
+:helen a :FemalePerson .
+
+## Generation 4
+:david a :MalePerson .
+:eliza a :FemalePerson .
+
+# Relations
+
+## Generation 1
+:adam :spouseOf :eva .
+
+## Generation 1>2
+:adam :parentOf :azura .
+:eva :parentOf :azura .
+:adam :adoptiveParentOf :abel .
+:eva :adoptiveParentOf :abel .
+
+## Generation 2
+:azura :spouseOf :antoine .
+:abel :spouseOf :ada .
+
+## Generation 2>3
+:azura :parentOf :bob .
+:azura :parentOf :carol .
+:azura :parentOf :helen .
+:carol :twinOf :bob .
+:antoine :parentOf :fiona .
+:antoine :parentOf :helen .
+:abel :parentOf :zela .
+:ada :parentOf :zela .
+
+## Generation 3
+:carol :spouseOf :carl .
+
+## Generation 3>4
+:bob :parentOf :david .
+:carol :parentOf :eliza .
+
+

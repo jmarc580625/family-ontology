@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Materialize gender-specific uncle/aunt relationships
+# Creates :auntOf and :uncleOf from :uncleAuntOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?uncleAunt :auntOf ?nibling .
+}
+WHERE {
+    ?uncleAunt :uncleAuntOf ?nibling .
+    ?uncleAunt a :FemalePerson .
+#    FILTER NOT EXISTS { ?uncleAunt :auntOf ?nibling }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?uncleAunt :uncleOf ?nibling .
+}
+WHERE {
+    ?uncleAunt :uncleAuntOf ?nibling .
+    ?uncleAunt a :MalePerson .
+#    FILTER NOT EXISTS { ?uncleAunt :uncleOf ?nibling }  # uncomment for idempotency (incremental updates)
+}

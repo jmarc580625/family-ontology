@@ -1,0 +1,24 @@
+# Python virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test results (regenerated)
+test_results.json
+
+# Dependency analyzer output (regenerated)
+scripts/output/

@@ -1,0 +1,19 @@
+PREFIX : <http://example.org/family#>
+
+# Insert inferred stepsibling relationships
+# A person is a stepsibling of another person if:
+# they have parents who are married but no shared biological parent
+
+INSERT {
+  ?x :stepSiblingOf ?y .
+}
+WHERE {
+  ?a :parentOf ?x .
+  ?b :parentOf ?y .
+  ?a :spouseOf ?b .
+  FILTER (?x != ?y)
+  FILTER NOT EXISTS {
+    ?p :parentOf ?x .
+    ?p :parentOf ?y .
+  }
+}

@@ -1,0 +1,23 @@
+PREFIX : <http://example.org/family#>
+
+
+# Materialize gender-specific cousin relationships
+# Creates :cousinFemaleOf and :cousinMaleOf from :cousinOf based on :FemalePerson/:MalePerson class
+
+INSERT {
+    ?cousin :cousinFemaleOf ?otherCousin .
+}
+WHERE {
+    ?cousin :cousinOf ?otherCousin .
+    ?cousin a :FemalePerson .
+#    FILTER NOT EXISTS { ?cousin :cousinFemaleOf ?otherCousin }  # uncomment for idempotency (incremental updates)
+} ;
+
+INSERT {
+    ?cousin :cousinMaleOf ?otherCousin .
+}
+WHERE {
+    ?cousin :cousinOf ?otherCousin .
+    ?cousin a :MalePerson .
+#    FILTER NOT EXISTS { ?cousin :cousinMaleOf ?otherCousin }  # uncomment for idempotency (incremental updates)
+}

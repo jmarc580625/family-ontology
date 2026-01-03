@@ -1,0 +1,59 @@
+graph TD
+  %% Individuals
+
+  %% Generation 1
+  adam[👨 Adam]
+  eva[👩 Eva]
+
+  %% Generation 2
+  azura[👩 Azura]
+  antoine[👨 Antoine]
+  abel[👨 Abel]
+  ada[👩 Ada]
+  
+  %% Generation 3
+  fiona[👩 Fiona]
+  bob[👨 Bob]
+  carol[👩 Carol]
+  carl[👨 Carl]
+  zela[👩 Zela]
+  helen[👩 Helen]
+  
+  %% Generation 4
+  david[👨 David]
+  eliza[👩 Eliza]
+  
+  %% relations
+
+  subgraph "Core, gender-neutral, given relationships"
+    %% Generation 1
+    adam-->|spouseOf|eva
+
+    %% Generation 1>2
+    adam-->|parentOf|azura
+    eva-->|parentOf|azura
+    adam-->|adoptiveParentOf|abel
+    eva-->|adoptiveParentOf|abel
+
+    %% Generation 2
+    azura-->|spouseOf|antoine
+    abel-->|spouseOf|ada
+
+    %% Generation 2>3
+    azura-->|parentOf|bob
+    azura-->|parentOf|carol
+    azura-->|parentOf|helen
+    carol-->|twinOf|bob
+    antoine-->|parentOf|fiona
+    antoine-->|parentOf|helen
+    abel-->|parentOf|zela
+    ada-->|parentOf|zela
+
+    %% Generation 3
+    carol-->|spouseOf|carl
+    
+    %% Generation 3>4
+    bob-->|parentOf|david
+    carol-->|parentOf|eliza
+  end
+  
