@@ -647,7 +647,6 @@
 :godmotherOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
     rdfs:domain :FemalePerson ;
     rdfs:comment "Indicates a person who is known to be a godmother of another person."@en ;
-    owl:inverseOf :goddaughterOf ;
     :materializationDependency :godParentOf ;
     :materializationScript "sparql/materialisation/materialize-godparent-GS.sparql" ;
     :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
@@ -657,7 +656,6 @@
 :godfatherOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
     rdfs:domain :MalePerson ;
     rdfs:comment "Indicates a person who is known to be a godfather of another person."@en ;
-    owl:inverseOf :godsonOf ;
     :materializationDependency :godParentOf ;
     :materializationScript "sparql/materialisation/materialize-godparent-GS.sparql" ;
     :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
@@ -667,7 +665,6 @@
 :goddaughterOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
     rdfs:domain :FemalePerson ;
     rdfs:comment "Indicates a person who is known to be a goddaughter of another person."@en ;
-    owl:inverseOf :godmotherOf ;
     :materializationDependency :godChildOf ;
     :materializationScript "sparql/materialisation/materialize-godchild-GS.sparql" ;
     :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;
@@ -677,7 +674,6 @@
 :godsonOf rdfs:subPropertyOf foaf:knows, owl:differentFrom ;
     rdfs:domain :MalePerson ;
     rdfs:comment "Indicates a person who is known to be a godson of another person."@en ;
-    owl:inverseOf :godfatherOf ;
     :materializationDependency :godChildOf ;
     :materializationScript "sparql/materialisation/materialize-godchild-GS.sparql" ;
     :materializationReason "Gender-specific subproperty materialized from base property and gender class" ;

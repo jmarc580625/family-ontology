@@ -156,7 +156,6 @@
     "2": [
       "sparql/materialisation/materialize-siblingOf-GN.sparql",
       "sparql/materialisation/materialize-uncleAuntOf-niblingOf-GN.sparql",
-      "sparql/materialisation/materialize-greatGrandparent-GN.sparql",
       "sparql/materialisation/materialize-siblingInLawOf-GN.sparql"
     ],
     "3": [
@@ -173,7 +172,6 @@
     ],
     "5": [
       "sparql/materialisation/materialize-siblingOf-GN.sparql",
-      "sparql/materialisation/materialize-greatGrandparent-GN.sparql",
       "sparql/materialisation/materialize-grandparent-GS.sparql",
       "sparql/materialisation/materialize-grandchild-GS.sparql",
       "sparql/materialisation/materialize-greatGrandparent-GS.sparql",
