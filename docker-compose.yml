@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   graphdb:
-    image: ontotext/graphdb:10.7.0-free
+    image: ontotext/graphdb:10.8.1
     container_name: family-ontology-graphdb
     ports:
       - "7200:7200"

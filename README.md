@@ -146,12 +146,13 @@ Outputs:
 # Start GraphDB
 docker-compose up -d
 
-# Access at http://localhost:7200
-# Create repository with OWL2-RL ruleset
-# Import ontology/family-ontology.ttl and test data
+# Wait ~30 seconds for GraphDB to initialize, then verify setup
+python scripts/verify_graphdb.py
+
+# Access GraphDB Workbench at http://localhost:7200
 
 # Run tests with GraphDB backend (experimental)
-python tests/cli.py run --mode graphdb --level all
+python tests/cli.py --mode graphdb run --level all
 ```
 
 ## Sample SPARQL Queries

@@ -62,6 +62,13 @@ class BaseTestRunner:
         
         return normalized
     
+    def _ensure_prefix(self, query: str) -> str:
+        """Ensure query has the family ontology PREFIX declaration."""
+        prefix = "PREFIX : <http://example.org/family#>"
+        if prefix not in query and "PREFIX :" not in query:
+            return f"{prefix}\n{query}"
+        return query
+    
     def run_test(self, test_id: str, test_case: Dict) -> bool:
         """
         Run a single test case.
@@ -78,8 +85,8 @@ class BaseTestRunner:
         print(f"Description: {test_case['description']}")
         
         try:
-            # Execute query
-            query = test_case['query'].strip()
+            # Execute query (ensure PREFIX is present)
+            query = self._ensure_prefix(test_case['query'].strip())
             results = self.backend.execute_query(query)
             actual = self.normalize_results(results)
             expected = test_case['expected']

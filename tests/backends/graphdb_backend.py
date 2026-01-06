@@ -73,36 +73,39 @@ class GraphDBBackend:
         """Create new repository with specified ruleset."""
         print(f"Creating repository: {self.repository_id} with ruleset: {self.ruleset}")
         
-        # Repository configuration in Turtle format
-        config_ttl = f"""
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
-@prefix rep: <http://www.openrdf.org/config/repository#>.
-@prefix sr: <http://www.openrdf.org/config/repository/sail#>.
-@prefix sail: <http://www.openrdf.org/config/sail#>.
-@prefix owlim: <http://www.ontotext.com/trree/owlim#>.
-
-[] a rep:Repository ;
-    rep:repositoryID "{self.repository_id}" ;
-    rdfs:label "Family Ontology Test Repository" ;
-    rep:repositoryImpl [
-        rep:repositoryType "graphdb:SailRepository" ;
-        sr:sailImpl [
-            sail:sailType "graphdb:Sail" ;
-            owlim:ruleset "{self.ruleset}" ;
-            owlim:base-URL "http://example.org/" ;
-            owlim:entity-index-size "10000000" ;
-            owlim:enable-context-index "true" ;
-            owlim:enablePredicateList "true" ;
-            owlim:in-memory-literal-properties "true" ;
-            owlim:enable-literal-index "true"
-        ]
-    ].
-"""
+        # Repository configuration in JSON format for GraphDB 10.x REST API
+        config = {
+            "id": self.repository_id,
+            "title": "Family Ontology Test Repository",
+            "type": "graphdb",
+            "params": {
+                "ruleset": {
+                    "label": "Ruleset",
+                    "name": "ruleset",
+                    "value": self.ruleset
+                },
+                "baseURL": {
+                    "label": "Base URL",
+                    "name": "baseURL",
+                    "value": "http://example.org/family#"
+                },
+                "defaultNS": {
+                    "label": "Default namespaces for imports(';' delimited)",
+                    "name": "defaultNS",
+                    "value": ""
+                },
+                "imports": {
+                    "label": "Imported RDF files(';' delimited)",
+                    "name": "imports",
+                    "value": ""
+                }
+            }
+        }
         
-        headers = {'Content-Type': 'text/turtle'}
+        headers = {'Content-Type': 'application/json'}
         response = requests.post(
             f"{self.graphdb_url}/rest/repositories",
-            data=config_ttl,
+            json=config,
             headers=headers
         )
         
