@@ -140,6 +140,8 @@ Outputs:
 
 ## Using with GraphDB
 
+> **Note**: GraphDB integration is implemented but not yet fully tested. The test suite currently runs against RDFLib by default. GraphDB support is available for users who want native OWL2-RL reasoning.
+
 ```bash
 # Start GraphDB
 docker-compose up -d
@@ -147,6 +149,9 @@ docker-compose up -d
 # Access at http://localhost:7200
 # Create repository with OWL2-RL ruleset
 # Import ontology/family-ontology.ttl and test data
+
+# Run tests with GraphDB backend (experimental)
+python tests/cli.py run --mode graphdb --level all
 ```
 
 ## Sample SPARQL Queries
