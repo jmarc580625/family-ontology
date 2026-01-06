@@ -1,10 +1,10 @@
 # Family Relationship Ontology
 
-A comprehensive OWL2 DL ontology for modeling complex family relationships. Supports 60+ relationship properties including biological, adoptive, in-law, and blended family relationships with automated inference via SPARQL materialization.
+A comprehensive OWL2 DL ontology for modeling complex family relationships. Supports 66 relationship properties including biological, adoptive, in-law, and blended family relationships with automated inference via SPARQL materialization.
 
 ## Key Features
 
-- **60+ Relationship Properties**: Core, extended, in-law, blended family, and social relationships
+- **66 Relationship Properties**: Core, extended, in-law, blended family, and social relationships
 - **Class-Based Gender Modeling**: `:MalePerson` and `:FemalePerson` classes for gender-specific properties
 - **OWL2 DL Compliance**: Property chains, inverse properties, symmetric/irreflexive constraints
 - **SPARQL Materialization**: Complex relationships inferred via SPARQL UPDATE scripts
@@ -16,7 +16,7 @@ A comprehensive OWL2 DL ontology for modeling complex family relationships. Supp
 ```
 family-ontology/
 ├── ontology/
-│   └── family-ontology.ttl       # Main ontology (60+ properties, 500+ triples)
+│   └── family-ontology.ttl       # Main ontology (66 properties, 527 triples)
 ├── sparql/
 │   └── materialisation/          # SPARQL UPDATE scripts for inference
 ├── tests/
@@ -26,7 +26,7 @@ family-ontology/
 │   └── backends/                 # RDFLib and GraphDB backends
 ├── scripts/
 │   ├── dependency_analyzer.py    # Generates dependency graphs
-│   └── output/                   # Generated graphs (Mermaid, JSON)
+│   └── output/                   # Generated graphs (created on demand)
 ├── doc/
 │   ├── TODO.md                   # Future enhancements
 │   └── blended_family_enhancement.md
@@ -67,8 +67,8 @@ python tests/cli.py run --level all
 # Run specific level (0-9)
 python tests/cli.py run --level 0
 
-# List available tests
-python tests/cli.py list
+# Run specific test by ID
+python tests/cli.py run --test 0.1.1
 ```
 
 ### Test Levels
@@ -76,7 +76,7 @@ python tests/cli.py list
 | Level | Description |
 |-------|-------------|
 | 0 | Base relationships (parentOf, childOf, spouseOf) |
-| 1 | First-order inference (grandparent, sibling, twin) |
+| 1 | First-order inference (grandparent, parentInLaw, sibling, twin) |
 | 2 | Second-order inference (greatGrandparent, uncleAunt, siblingInLaw) |
 | 3 | Third-order inference (cousin) |
 | 4-6 | Gender-specific variants |
