@@ -1,0 +1,31 @@
+{
+  "materialization_order": [
+    "materialize-siblingOf-GN.sparql",
+    "materialize-uncleAuntOf-niblingOf-GN.sparql",
+    "materialize-siblingInLawOf-GN.sparql",
+    "materialize-cousinOf-GN.sparql",
+    "materialize-spouse-GS.sparql",
+    "materialize-parent-GS.sparql",
+    "materialize-child-GS.sparql",
+    "materialize-sibling-GS.sparql",
+    "materialize-grandparent-GS.sparql",
+    "materialize-grandchild-GS.sparql",
+    "materialize-greatGrandparent-GS.sparql",
+    "materialize-greatGrandchild-GS.sparql",
+    "materialize-uncleAunt-GS.sparql",
+    "materialize-nibling-GS.sparql",
+    "materialize-cousin-GS.sparql",
+    "materialize-parentInLaw-GS.sparql",
+    "materialize-childInLaw-GS.sparql",
+    "materialize-siblingInLaw-GS.sparql",
+    "materialize-stepSiblingOf-GN.sparql",
+    "materialize-halfSiblingOf-GN.sparql",
+    "materialize-stepParentOf-stepChildOf-GN.sparql",
+    "materialize-stepParent-GS.sparql",
+    "materialize-stepChild-GS.sparql",
+    "materialize-stepSibling-GS.sparql",
+    "materialize-halfSibling-GS.sparql",
+    "materialize-godparent-GS.sparql",
+    "materialize-godchild-GS.sparql"
+  ]
+}

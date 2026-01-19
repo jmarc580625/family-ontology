@@ -49,6 +49,22 @@ def cmd_run_tests(args):
     with open(config_file, 'r') as f:
         config = json.load(f)
     
+    # Validate level early if specified
+    test_levels = config.get('test_levels', {})
+    valid_levels = sorted([int(k) for k in test_levels.keys() if k != 'all'])
+    
+    if args.level and args.level != 'all':
+        try:
+            level = int(args.level)
+            if level not in valid_levels:
+                valid_str = ', '.join(str(v) for v in valid_levels)
+                print(f"\n❌ Invalid level: {args.level}. Valid levels: {valid_str} or 'all'", file=sys.stderr)
+                sys.exit(1)
+        except ValueError:
+            valid_str = ', '.join(str(v) for v in valid_levels)
+            print(f"\n❌ Invalid level: {args.level}. Valid levels: {valid_str} or 'all'", file=sys.stderr)
+            sys.exit(1)
+    
     # Determine data files
     # Priority: 1) CLI args, 2) level-specific config
     # No implicit defaults - configuration must be explicit
@@ -59,10 +75,9 @@ def cmd_run_tests(args):
         data_files = args.data
     elif args.level == 'all':
         # Collect all unique data files from all levels
-        test_levels = config.get('test_levels', {})
         all_data_files = []
         seen = set()
-        for level in range(10):
+        for level in valid_levels:
             level_config = test_levels.get(str(level), {})
             for data_file in level_config.get('data_files', []):
                 if data_file not in seen:
@@ -71,7 +86,6 @@ def cmd_run_tests(args):
         data_files = all_data_files if all_data_files else None
     elif args.level:
         # Check if this level has specific data files
-        test_levels = config.get('test_levels', {})
         level_config = test_levels.get(str(args.level), {})
         if 'data_files' in level_config:
             data_files = level_config['data_files']
@@ -115,8 +129,12 @@ def cmd_run_tests(args):
         if args.level is not None:
             if args.level == 'all':
                 # Run all levels together - single initialization with all materialization
+                test_levels = executor.config.get('test_levels', {})
+                valid_levels = sorted([int(k) for k in test_levels.keys() if k != 'all'])
+                level_range_str = f"{min(valid_levels)}-{max(valid_levels)}" if valid_levels else "none"
+                
                 print("\n" + "="*80)
-                print("RUNNING ALL LEVELS TOGETHER (0-9)")
+                print(f"RUNNING ALL LEVELS TOGETHER ({level_range_str})")
                 print("Testing everything working together with all materialization applied")
                 print("="*80)
                 
@@ -130,12 +148,12 @@ def cmd_run_tests(args):
                     # Fallback: collect from all levels with deduplication
                     all_materialize = []
                     seen = set()
-                    for level in range(10):
+                    for level in valid_levels:
                         for script in mat_config.get(str(level), []):
                             if script not in seen:
                                 all_materialize.append(script)
                                 seen.add(script)
-                    print("\nAuto-collecting from all levels (0-9) with deduplication")
+                    print(f"\nAuto-collecting from all levels ({level_range_str}) with deduplication")
                 
                 if all_materialize:
                     print(f"Loaded {len(all_materialize)} materialization requirement(s)\n")
@@ -149,8 +167,7 @@ def cmd_run_tests(args):
                 
                 # Run all tests from all levels
                 all_test_ids = []
-                test_levels = executor.config.get('test_levels', {})
-                for level in range(10):
+                for level in valid_levels:
                     test_ids = test_levels.get(str(level), {}).get('tests', [])
                     all_test_ids.extend(test_ids)
                 
@@ -162,7 +179,7 @@ def cmd_run_tests(args):
                 print("RESULTS BY LEVEL")
                 print("="*80)
                 
-                for level in range(10):
+                for level in valid_levels:
                     level_name = test_levels.get(str(level), {}).get('name', f'Level {level}')
                     test_ids = test_levels.get(str(level), {}).get('tests', [])
                     
@@ -197,12 +214,20 @@ def cmd_run_tests(args):
                 # Run specific level (handles its own materialization from config if not specified)
                 try:
                     level = int(args.level)
-                    if level < 0 or level > 9:
-                        raise ValueError(f"Level must be between 0-9, got {level}")
+                    # Get valid levels from config
+                    test_levels = executor.config.get('test_levels', {})
+                    valid_levels = [int(k) for k in test_levels.keys() if k != 'all']
+                    if level not in valid_levels:
+                        valid_str = ', '.join(str(v) for v in sorted(valid_levels))
+                        raise ValueError(f"Level {level} not found in config. Valid levels: {valid_str}")
                     materialize = args.materialize  # Pass None if not specified, so config is used
                     results = executor.run_level(level, materialize)
                 except ValueError as e:
-                    print(f"\n❌ Invalid level: {args.level}. Use 0-9 or 'all'", file=sys.stderr)
+                    # Get valid levels for error message
+                    test_levels = executor.config.get('test_levels', {})
+                    valid_levels = sorted([int(k) for k in test_levels.keys() if k != 'all'])
+                    valid_str = ', '.join(str(v) for v in valid_levels)
+                    print(f"\n❌ Invalid level: {args.level}. Use {valid_str} or 'all'", file=sys.stderr)
                     backend.cleanup()
                     sys.exit(1)
         else:
@@ -331,7 +356,7 @@ Examples:
     # Run tests command
     run_parser = subparsers.add_parser('run', help='Run tests')
     run_parser.add_argument('--level', 
-                           help='Run specific dependency level (0-9 or "all")')
+                           help='Run specific dependency level (0-10 or "all")')
     run_parser.add_argument('--test', help='Run specific test ID (e.g., 0.1.4)')
     run_parser.add_argument('--data', nargs='+', help='Test data files')
     run_parser.add_argument('--test-file', help='Test definitions JSON file')

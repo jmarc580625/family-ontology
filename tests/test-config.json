@@ -1,14 +1,15 @@
 {
   "test_levels": {
     "0": {
-      "name": "Level 0: Base relationships (parentOf, childOf, spouseOf)",
+      "name": "Level 0: Base relationships (parentOf, childOf, spouseOf, partnerships)",
       "tests": [
-        "0.1.1",
-        "0.1.2",
-        "0.1.3",
-        "0.1.4",
-        "0.1.5",
-        "4.1.1"
+        "2.1.1",
+        "2.1.2",
+        "2.1.3",
+        "2.1.4",
+        "2.1.7",
+        "2.1.8",
+        "6.1.1"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -17,24 +18,25 @@
     "1": {
       "name": "Level 1: First-order inference (grandparent, parentInLaw, sibling, twin)",
       "tests": [
-        "0.1.6",
-        "1.1.1",
-        "1.1.2",
-        "2.1.1",
-        "2.1.2"
+        "3.1.1",
+        "3.1.2",
+        "4.1.1",
+        "4.1.2"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
       ]
     },
     "2": {
-      "name": "Level 2: Second-order inference (greatGrandparent, uncleAunt, nibling, siblingInLaw)",
+      "name": "Level 2: Second-order inference (greatGrandparent, uncleAunt, nibling, siblingInLaw, ancestor)",
       "tests": [
-        "1.1.3",
-        "1.1.4",
-        "1.1.6",
-        "1.1.7",
-        "2.1.3"
+        "3.1.3",
+        "3.1.4",
+        "3.1.6",
+        "3.1.7",
+        "3.1.8",
+        "3.1.9",
+        "4.1.3"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -43,7 +45,7 @@
     "3": {
       "name": "Level 3: Third-order inference (cousin)",
       "tests": [
-        "1.1.5"
+        "3.1.5"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -52,14 +54,14 @@
     "4": {
       "name": "Gender-specific: spouse, parent, child, sibling",
       "tests": [
-        "0.2.1",
-        "0.2.2",
-        "0.2.3",
-        "0.2.4",
-        "0.2.5",
-        "0.2.6",
-        "0.2.7",
-        "0.2.8"
+        "2.2.1",
+        "2.2.2",
+        "2.2.3",
+        "2.2.4",
+        "2.2.5",
+        "2.2.6",
+        "2.2.7",
+        "2.2.8"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -68,14 +70,14 @@
     "5": {
       "name": "Gender-specific: grandparent, grandchild, great-grandparent",
       "tests": [
-        "1.2.1",
-        "1.2.2",
-        "1.2.3",
-        "1.2.4",
-        "1.2.11",
-        "1.2.12",
-        "1.2.13",
-        "1.2.14"
+        "3.2.1",
+        "3.2.2",
+        "3.2.3",
+        "3.2.4",
+        "3.2.11",
+        "3.2.12",
+        "3.2.13",
+        "3.2.14"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -84,12 +86,12 @@
     "6": {
       "name": "Gender-specific: uncleAunt, nibling, cousin",
       "tests": [
-        "1.2.5",
-        "1.2.6",
-        "1.2.7",
-        "1.2.8",
-        "1.2.9",
-        "1.2.10"
+        "3.2.5",
+        "3.2.6",
+        "3.2.7",
+        "3.2.8",
+        "3.2.9",
+        "3.2.10"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -98,12 +100,12 @@
     "7": {
       "name": "Gender-specific: in-law relationships",
       "tests": [
-        "2.2.1",
-        "2.2.2",
-        "2.2.3",
-        "2.2.4",
-        "2.2.5",
-        "2.2.6"
+        "4.2.1",
+        "4.2.2",
+        "4.2.3",
+        "4.2.4",
+        "4.2.5",
+        "4.2.6"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -112,18 +114,18 @@
     "8": {
       "name": "Blended family: step and half-siblings",
       "tests": [
-        "3.1.1",
-        "3.1.2",
-        "3.1.3",
-        "3.1.4",
-        "3.2.1",
-        "3.2.2",
-        "3.2.3",
-        "3.2.4",
-        "3.2.5",
-        "3.2.6",
-        "3.2.7",
-        "3.2.8"
+        "5.1.1",
+        "5.1.2",
+        "5.1.3",
+        "5.1.4",
+        "5.2.1",
+        "5.2.2",
+        "5.2.3",
+        "5.2.4",
+        "5.2.5",
+        "5.2.6",
+        "5.2.7",
+        "5.2.8"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl"
@@ -132,19 +134,28 @@
     "9": {
       "name": "Family-anchored & social: godparents, witnesses & friends",
       "tests": [
-        "6.1.1",
-        "6.1.2",
-        "6.1.3",
-        "6.2.1",
-        "6.2.2",
-        "6.2.3",
-        "6.2.4",
-        "7.1.1",
-        "7.1.2"
+        "8.1.1",
+        "8.1.2",
+        "8.1.3",
+        "8.2.1",
+        "8.2.2",
+        "8.2.3",
+        "8.2.4",
+        "9.1.1",
+        "9.1.2"
       ],
       "data_files": [
         "tests/data/family-sample-data.ttl",
         "tests/data/family-anchors-data.ttl"
+      ]
+    },
+    "10": {
+      "name": "Super-property: relatedTo",
+      "tests": [
+        "1.1.1"
+      ],
+      "data_files": [
+        "tests/data/family-sample-data.ttl"
       ]
     }
   },
@@ -203,6 +214,35 @@
       "sparql/materialisation/materialize-halfSibling-GS.sparql"
     ],
     "9": [
+      "sparql/materialisation/materialize-godparent-GS.sparql",
+      "sparql/materialisation/materialize-godchild-GS.sparql"
+    ],
+    "10": [
+      "sparql/materialisation/materialize-siblingOf-GN.sparql",
+      "sparql/materialisation/materialize-uncleAuntOf-niblingOf-GN.sparql",
+      "sparql/materialisation/materialize-cousinOf-GN.sparql",
+      "sparql/materialisation/materialize-siblingInLawOf-GN.sparql",
+      "sparql/materialisation/materialize-stepSiblingOf-GN.sparql",
+      "sparql/materialisation/materialize-halfSiblingOf-GN.sparql",
+      "sparql/materialisation/materialize-stepParentOf-stepChildOf-GN.sparql",
+      "sparql/materialisation/materialize-spouse-GS.sparql",
+      "sparql/materialisation/materialize-parent-GS.sparql",
+      "sparql/materialisation/materialize-child-GS.sparql",
+      "sparql/materialisation/materialize-sibling-GS.sparql",
+      "sparql/materialisation/materialize-grandparent-GS.sparql",
+      "sparql/materialisation/materialize-grandchild-GS.sparql",
+      "sparql/materialisation/materialize-greatGrandparent-GS.sparql",
+      "sparql/materialisation/materialize-greatGrandchild-GS.sparql",
+      "sparql/materialisation/materialize-uncleAunt-GS.sparql",
+      "sparql/materialisation/materialize-nibling-GS.sparql",
+      "sparql/materialisation/materialize-cousin-GS.sparql",
+      "sparql/materialisation/materialize-parentInLaw-GS.sparql",
+      "sparql/materialisation/materialize-childInLaw-GS.sparql",
+      "sparql/materialisation/materialize-siblingInLaw-GS.sparql",
+      "sparql/materialisation/materialize-stepParent-GS.sparql",
+      "sparql/materialisation/materialize-stepChild-GS.sparql",
+      "sparql/materialisation/materialize-stepSibling-GS.sparql",
+      "sparql/materialisation/materialize-halfSibling-GS.sparql",
       "sparql/materialisation/materialize-godparent-GS.sparql",
       "sparql/materialisation/materialize-godchild-GS.sparql"
     ]

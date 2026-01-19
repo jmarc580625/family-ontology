@@ -57,4 +57,11 @@
 :bob :parentOf :david .
 :carol :parentOf :eliza .
 
+# Other couple engagement
+:re a :MalePerson .
+:hathor a :FemalePerson .
+:re :lifePartnerOf :hathor .
 
+:hera a :FemalePerson .
+:zeus a :MalePerson .
+:hera :civilPartnerOf :zeus .

@@ -1,0 +1,34 @@
+@prefix : <http://example.org/family#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <http://purl.org/vocab/relationship/> .
+
+#---------------------------
+# Equivalence Ontology
+#---------------------------
+
+<http://example.org/family/rel-equivalence> a owl:Ontology ;
+    owl:versionIRI <http://example.org/family/rel-equivalence/1.0.0> ;
+    owl:versionInfo "1.0.0" ;
+    rdfs:label "Family Ontology - Relationship Vocabulary Equivalences"@en ;
+    rdfs:comment """Declares equivalences between the Family Ontology properties 
+        and the Relationship Vocabulary (rel:) properties. 
+        Import this ontology to enable interoperability with rel: vocabulary."""@en ;
+    owl:imports <http://example.org/family> ;
+    rdfs:seeAlso <https://vocab.org/relationship/> .
+
+#---------------------------
+# Property Equivalences
+#---------------------------
+
+:spouseOf owl:equivalentProperty rel:spouseOf .
+:parentOf owl:equivalentProperty rel:parentOf .
+:childOf owl:equivalentProperty rel:childOf .
+:siblingOf owl:equivalentProperty rel:siblingOf .
+:grandparentOf owl:equivalentProperty rel:grandparentOf .
+:grandchildOf owl:equivalentProperty rel:grandchildOf .
+:friendOf owl:equivalentProperty rel:friendOf .
+:closeFriendOf owl:equivalentProperty rel:closeFriendOf .
+:lifePartnerOf owl:equivalentProperty rel:lifePartnerOf .
+:ancestorOf owl:equivalentProperty rel:ancestorOf .
+:descendantOf owl:equivalentProperty rel:descendantOf .

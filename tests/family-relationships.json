@@ -7,7 +7,25 @@
     "rel": "http://purl.org/vocab/relationship/"
   },
   "tests": {
-    "0.1.1": {
+    "1.1.1": {
+      "name": "RelatedTo super-property for adam",
+      "description": "Test relatedTo super-property returns all family relationships for a specific person (adam)",
+      "query": "SELECT DISTINCT ?related WHERE { :adam :relatedTo ?related . } ORDER BY ?related",
+      "expected": [
+        { "related": ":abel" },
+        { "related": ":ada" },
+        { "related": ":antoine" },
+        { "related": ":azura" },
+        { "related": ":bob" },
+        { "related": ":carol" },
+        { "related": ":david" },
+        { "related": ":eliza" },
+        { "related": ":eva" },
+        { "related": ":helen" },
+        { "related": ":zela" }
+      ]
+    },
+    "2.1.1": {
       "name": "Spouse relationships",
       "description": "Test spouse relationships (explicit in data, reflexive)",
       "query": "SELECT ?spouse1 ?spouse2 WHERE { ?spouse1 :spouseOf ?spouse2 . } ORDER BY ?spouse1 ?spouse2",
@@ -22,7 +40,7 @@
         { "spouse1": ":carl", "spouse2": ":carol" }
       ]
     },
-    "0.1.2": {
+    "2.1.2": {
       "name": "Direct parent-child relationships",
       "description": "Test direct parent-child relationships (explicit in data, inverse of child)",
       "query": "SELECT ?parent ?child WHERE { ?parent :parentOf ?child . } ORDER BY ?parent ?child",
@@ -42,7 +60,7 @@
         { "parent": ":eva", "child": ":abel" }
       ]
     },
-    "0.1.3": {
+    "2.1.3": {
       "name": "Child-parent relationships",
       "description": "Test child-parent relationships (inferred, inverse of parent)",
       "query": "SELECT ?child ?parent WHERE { ?child :childOf ?parent . } ORDER BY ?child ?parent",
@@ -62,7 +80,7 @@
         { "child": ":zela", "parent": ":ada" }
       ]
     },
-    "0.1.4": {
+    "2.1.4": {
       "name": "Adoptive parent relationships",
       "description": "Test adoptive parent relationships (subproperty of parentOf)",
       "query": "SELECT ?adoptiveParent ?adoptiveChild WHERE { ?adoptiveParent :adoptiveParentOf ?adoptiveChild . } ORDER BY ?adoptiveParent ?adoptiveChild",
@@ -71,7 +89,7 @@
         { "adoptiveParent": ":eva", "adoptiveChild": ":abel" }
       ]
     },
-    "0.1.5": {
+    "2.1.5": {
       "name": "Adoptive child relationships",
       "description": "Test adoptive child relationships (inverse of adoptiveParentOf)",
       "query": "SELECT ?adoptiveChild ?adoptiveParent WHERE { ?adoptiveChild :adoptiveChildOf ?adoptiveParent . } ORDER BY ?adoptiveChild ?adoptiveParent",
@@ -80,7 +98,7 @@
         { "adoptiveChild": ":abel", "adoptiveParent": ":eva" }
       ]
     },
-    "0.1.6": {
+    "2.1.6": {
       "name": "Sibling relationships",
       "description": "Test sibling relationships (materialized, irreflexive)",
       "query": "SELECT ?sibling1 ?sibling2 WHERE { ?sibling1 :siblingOf ?sibling2 . } ORDER BY ?sibling1 ?sibling2",
@@ -97,7 +115,25 @@
         { "sibling1": ":helen", "sibling2": ":fiona" }
       ]
     },
-    "0.2.1": {
+    "2.1.7": {
+      "name": "Civil partner relationships",
+      "description": "Test civil partner relationships (symmetric, legal civil union)",
+      "query": "SELECT ?partner1 ?partner2 WHERE { ?partner1 :civilPartnerOf ?partner2 . } ORDER BY ?partner1 ?partner2",
+      "expected": [
+        { "partner1": ":hera", "partner2": ":zeus" },
+        { "partner1": ":zeus", "partner2": ":hera" }
+      ]
+    },
+    "2.1.8": {
+      "name": "Life partner relationships",
+      "description": "Test life partner relationships (symmetric, long-term commitment)",
+      "query": "SELECT ?partner1 ?partner2 WHERE { ?partner1 :lifePartnerOf ?partner2 . } ORDER BY ?partner1 ?partner2",
+      "expected": [
+        { "partner1": ":hathor", "partner2": ":re" },
+        { "partner1": ":re", "partner2": ":hathor" }
+      ]
+    },
+    "2.2.1": {
       "name": "Wife relationships",
       "description": "Test wife relationships (female spouse, subproperty of spouseOf)",
       "query": "SELECT ?wife ?spouse WHERE { ?wife :wifeOf ?spouse . } ORDER BY ?wife ?spouse",
@@ -108,7 +144,7 @@
         { "wife": ":eva", "spouse": ":adam" }
       ]
     },
-    "0.2.2": {
+    "2.2.2": {
       "name": "Husband relationships",
       "description": "Test husband relationships (male spouse, subproperty of spouseOf)",
       "query": "SELECT ?husband ?spouse WHERE { ?husband :husbandOf ?spouse . } ORDER BY ?husband ?spouse",
@@ -119,7 +155,7 @@
         { "husband": ":carl", "spouse": ":carol" }
       ]
     },
-    "0.2.3": {
+    "2.2.3": {
       "name": "Mother relationships",
       "description": "Test mother relationships (generic is parentOf, inferred)",
       "query": "SELECT ?mother ?child WHERE { ?mother :motherOf ?child . } ORDER BY ?mother ?child",
@@ -133,7 +169,7 @@
         { "mother": ":eva", "child": ":abel" }
       ]
     },
-    "0.2.4": {
+    "2.2.4": {
       "name": "Father relationships",
       "description": "Test father relationships (generic is parentOf, inferred)",
       "query": "SELECT ?father ?child WHERE { ?father :fatherOf ?child . } ORDER BY ?father ?child",
@@ -146,7 +182,7 @@
         { "father": ":bob", "child": ":david" }
       ]
     },
-    "0.2.5": {
+    "2.2.5": {
       "name": "Daughter relationships",
       "description": "Test daughter relationships (generic is childOf, inferred)",
       "query": "SELECT ?daughter ?parent WHERE { ?daughter :daughterOf ?parent . } ORDER BY ?daughter ?parent",
@@ -162,7 +198,7 @@
         { "daughter": ":zela", "parent": ":ada" }
       ]
     },
-    "0.2.6": {
+    "2.2.6": {
       "name": "Son relationships",
       "description": "Test son relationships (generic is childOf, inferred)",
       "query": "SELECT ?son ?parent WHERE { ?son :sonOf ?parent . } ORDER BY ?son ?parent",
@@ -173,7 +209,7 @@
         { "son": ":david", "parent": ":bob" }
       ]
     },
-    "0.2.7": {
+    "2.2.7": {
       "name": "Sister relationships",
       "description": "Test sister relationships (generic is siblingOf, inferred)",
       "query": "SELECT ?sister ?sibling WHERE { ?sister :sisterOf ?sibling . } ORDER BY ?sister ?sibling",
@@ -187,7 +223,7 @@
         { "sister": ":helen", "sibling": ":fiona" }
       ]
     },
-    "0.2.8": {
+    "2.2.8": {
       "name": "Brother relationships",
       "description": "Test brother relationships (generic is siblingOf, inferred)",
       "query": "SELECT ?brother ?sibling WHERE { ?brother :brotherOf ?sibling . } ORDER BY ?brother ?sibling",
@@ -197,7 +233,7 @@
         { "brother": ":bob", "sibling": ":helen" }
       ]
     },
-    "1.1.1": {
+    "3.1.1": {
       "name": "Grandparent relationships",
       "description": "Test grandparent relationships (inferred, inverse of grandchild)",
       "query": "SELECT ?grandparent ?grandchild WHERE { ?grandparent :grandparentOf ?grandchild . } ORDER BY ?grandparent ?grandchild",
@@ -214,7 +250,7 @@
         { "grandparent": ":eva", "grandchild": ":zela" }
       ]
     },
-    "1.1.2": {
+    "3.1.2": {
       "name": "Grandchild relationships",
       "description": "Test grandchild relationships (inferred, inverse of grandparent)",
       "query": "SELECT ?grandchild ?grandparent WHERE { ?grandchild :grandchildOf ?grandparent . } ORDER BY ?grandchild ?grandparent",
@@ -231,7 +267,7 @@
         { "grandchild": ":zela", "grandparent": ":eva" }
       ]
     },
-    "1.1.3": {
+    "3.1.3": {
       "name": "Uncle/Aunt relationships",
       "description": "Test uncle/aunt relationships (materialized, inverse of nephew/niece)",
       "query": "SELECT ?uncleAunt ?nephewNiece WHERE { ?uncleAunt :uncleAuntOf ?nephewNiece . } ORDER BY ?uncleAunt ?nephewNiece",
@@ -251,7 +287,7 @@
         { "uncleAunt": ":helen", "nephewNiece": ":eliza" }
       ]
     },
-    "1.1.4": {
+    "3.1.4": {
       "name": "Nibling (niece/nephew) relationships",
       "description": "Test nibling relationships (inverse of Uncle/Aunt)",
       "query": "SELECT ?nibling ?uncleAunt WHERE { ?nibling :niblingOf ?uncleAunt . } ORDER BY ?nibling ?uncleAunt",
@@ -271,7 +307,7 @@
         { "nibling": ":zela", "uncleAunt": ":azura" }
       ]
     },
-    "1.1.5": {
+    "3.1.5": {
       "name": "Cousin relationships",
       "description": "Test cousin relationships (materialized, symmetric, irreflexive)",
       "query": "SELECT ?cousin1 ?cousin2 WHERE { ?cousin1 :cousinOf ?cousin2 . } ORDER BY ?cousin1 ?cousin2",
@@ -288,7 +324,7 @@
         { "cousin1": ":zela", "cousin2": ":helen" }
       ]
     },
-    "1.1.6": {
+    "3.1.6": {
       "name": "Great-grandparent relationships",
       "description": "Test great-grandparent relationships (inferred via property chain)",
       "query": "SELECT ?greatGrandparent ?greatGrandchild WHERE { ?greatGrandparent :greatGrandparentOf ?greatGrandchild . } ORDER BY ?greatGrandparent ?greatGrandchild",
@@ -299,7 +335,7 @@
         { "greatGrandparent": ":eva", "greatGrandchild": ":eliza" }
       ]
     },
-    "1.1.7": {
+    "3.1.7": {
       "name": "Great-grandchild relationships",
       "description": "Test great-grandchild relationships (inverse of greatGrandparentOf)",
       "query": "SELECT ?greatGrandchild ?greatGrandparent WHERE { ?greatGrandchild :greatGrandchildOf ?greatGrandparent . } ORDER BY ?greatGrandchild ?greatGrandparent",
@@ -310,7 +346,75 @@
         { "greatGrandchild": ":eliza", "greatGrandparent": ":eva" }
       ]
     },
-    "1.2.1": {
+    "3.1.8": {
+      "name": "Ancestor relationships",
+      "description": "Test ancestor relationships (transitive closure of parentOf)",
+      "query": "SELECT ?ancestor ?descendant WHERE { ?ancestor :ancestorOf ?descendant . } ORDER BY ?ancestor ?descendant",
+      "expected": [
+        { "ancestor": ":adam", "descendant": ":azura" },
+        { "ancestor": ":adam", "descendant": ":abel" },
+        { "ancestor": ":adam", "descendant": ":bob" },
+        { "ancestor": ":adam", "descendant": ":carol" },
+        { "ancestor": ":adam", "descendant": ":helen" },
+        { "ancestor": ":adam", "descendant": ":zela" },
+        { "ancestor": ":adam", "descendant": ":david" },
+        { "ancestor": ":adam", "descendant": ":eliza" },
+        { "ancestor": ":eva", "descendant": ":azura" },
+        { "ancestor": ":eva", "descendant": ":abel" },
+        { "ancestor": ":eva", "descendant": ":bob" },
+        { "ancestor": ":eva", "descendant": ":carol" },
+        { "ancestor": ":eva", "descendant": ":helen" },
+        { "ancestor": ":eva", "descendant": ":zela" },
+        { "ancestor": ":eva", "descendant": ":david" },
+        { "ancestor": ":eva", "descendant": ":eliza" },
+        { "ancestor": ":azura", "descendant": ":bob" },
+        { "ancestor": ":azura", "descendant": ":carol" },
+        { "ancestor": ":azura", "descendant": ":helen" },
+        { "ancestor": ":azura", "descendant": ":david" },
+        { "ancestor": ":azura", "descendant": ":eliza" },
+        { "ancestor": ":antoine", "descendant": ":fiona" },
+        { "ancestor": ":antoine", "descendant": ":helen" },
+        { "ancestor": ":abel", "descendant": ":zela" },
+        { "ancestor": ":ada", "descendant": ":zela" },
+        { "ancestor": ":bob", "descendant": ":david" },
+        { "ancestor": ":carol", "descendant": ":eliza" }
+      ]
+    },
+    "3.1.9": {
+      "name": "Descendant relationships",
+      "description": "Test descendant relationships (inverse of ancestorOf, transitive closure of childOf)",
+      "query": "SELECT ?descendant ?ancestor WHERE { ?descendant :descendantOf ?ancestor . } ORDER BY ?descendant ?ancestor",
+      "expected": [
+        { "descendant": ":abel", "ancestor": ":adam" },
+        { "descendant": ":abel", "ancestor": ":eva" },
+        { "descendant": ":azura", "ancestor": ":adam" },
+        { "descendant": ":azura", "ancestor": ":eva" },
+        { "descendant": ":bob", "ancestor": ":adam" },
+        { "descendant": ":bob", "ancestor": ":eva" },
+        { "descendant": ":bob", "ancestor": ":azura" },
+        { "descendant": ":carol", "ancestor": ":adam" },
+        { "descendant": ":carol", "ancestor": ":eva" },
+        { "descendant": ":carol", "ancestor": ":azura" },
+        { "descendant": ":david", "ancestor": ":adam" },
+        { "descendant": ":david", "ancestor": ":eva" },
+        { "descendant": ":david", "ancestor": ":azura" },
+        { "descendant": ":david", "ancestor": ":bob" },
+        { "descendant": ":eliza", "ancestor": ":adam" },
+        { "descendant": ":eliza", "ancestor": ":eva" },
+        { "descendant": ":eliza", "ancestor": ":azura" },
+        { "descendant": ":eliza", "ancestor": ":carol" },
+        { "descendant": ":fiona", "ancestor": ":antoine" },
+        { "descendant": ":helen", "ancestor": ":adam" },
+        { "descendant": ":helen", "ancestor": ":eva" },
+        { "descendant": ":helen", "ancestor": ":azura" },
+        { "descendant": ":helen", "ancestor": ":antoine" },
+        { "descendant": ":zela", "ancestor": ":adam" },
+        { "descendant": ":zela", "ancestor": ":eva" },
+        { "descendant": ":zela", "ancestor": ":abel" },
+        { "descendant": ":zela", "ancestor": ":ada" }
+      ]
+    },
+    "3.2.1": {
       "name": "Grandmother relationships",
       "description": "Test grandmother relationships (gender-specific grandparent, materialized)",
       "query": "SELECT ?grandmother ?grandchild WHERE { ?grandmother :grandmotherOf ?grandchild . } ORDER BY ?grandmother ?grandchild",
@@ -323,7 +427,7 @@
         { "grandmother": ":eva", "grandchild": ":zela" }
       ]
     },
-    "1.2.2": {
+    "3.2.2": {
       "name": "Grandfather relationships",
       "description": "Test grandfather relationships (gender-specific grandparent, materialized)",
       "query": "SELECT ?grandfather ?grandchild WHERE { ?grandfather :grandfatherOf ?grandchild . } ORDER BY ?grandfather ?grandchild",
@@ -334,7 +438,7 @@
         { "grandfather": ":adam", "grandchild": ":zela" }
       ]
     },
-    "1.2.3": {
+    "3.2.3": {
       "name": "Granddaughter relationships",
       "description": "Test granddaughter relationships (gender-specific grandchild, materialized)",
       "query": "SELECT ?granddaughter ?grandparent WHERE { ?granddaughter :granddaughterOf ?grandparent . } ORDER BY ?granddaughter ?grandparent",
@@ -348,7 +452,7 @@
         { "granddaughter": ":zela", "grandparent": ":eva" }
       ]
     },
-    "1.2.4": {
+    "3.2.4": {
       "name": "Grandson relationships",
       "description": "Test grandson relationships (gender-specific grandchild, materialized)",
       "query": "SELECT ?grandson ?grandparent WHERE { ?grandson :grandsonOf ?grandparent . } ORDER BY ?grandson ?grandparent",
@@ -358,7 +462,7 @@
         { "grandson": ":david", "grandparent": ":azura" }
       ]
     },
-    "1.2.5": {
+    "3.2.5": {
       "name": "Aunt relationships",
       "description": "Test aunt relationships (gender-specific uncle/aunt, materialized)",
       "query": "SELECT ?aunt ?nephewNiece WHERE { ?aunt :auntOf ?nephewNiece . } ORDER BY ?aunt ?nephewNiece",
@@ -372,7 +476,7 @@
         { "aunt": ":helen", "nephewNiece": ":eliza" }
       ]
     },
-    "1.2.6": {
+    "3.2.6": {
       "name": "Uncle relationships",
       "description": "Test uncle relationships (gender-specific uncle/aunt, materialized)",
       "query": "SELECT ?uncle ?nephewNiece WHERE { ?uncle :uncleOf ?nephewNiece . } ORDER BY ?uncle ?nephewNiece",
@@ -385,7 +489,7 @@
         { "uncle": ":carl", "nephewNiece": ":david" }
       ]
     },
-    "1.2.7": {
+    "3.2.7": {
       "name": "Niece relationships",
       "description": "Test niece relationships (gender-specific nibling, materialized)",
       "query": "SELECT ?niece ?uncleAunt WHERE { ?niece :nieceOf ?uncleAunt . } ORDER BY ?niece ?uncleAunt",
@@ -400,7 +504,7 @@
         { "niece": ":zela", "uncleAunt": ":azura" }
       ]
     },
-    "1.2.8": {
+    "3.2.8": {
       "name": "Nephew relationships",
       "description": "Test nephew relationships (gender-specific nibling, materialized)",
       "query": "SELECT ?nephew ?uncleAunt WHERE { ?nephew :nephewOf ?uncleAunt . } ORDER BY ?nephew ?uncleAunt",
@@ -412,7 +516,7 @@
         { "nephew": ":david", "uncleAunt": ":helen" }
       ]
     },
-    "1.2.9": {
+    "3.2.9": {
       "name": "Female cousin relationships",
       "description": "Test female cousin relationships (gender-specific cousin, materialized)",
       "query": "SELECT ?cousinFemale ?cousin WHERE { ?cousinFemale :cousinFemaleOf ?cousin . } ORDER BY ?cousinFemale ?cousin",
@@ -427,7 +531,7 @@
         { "cousinFemale": ":zela", "cousin": ":helen" }
       ]
     },
-    "1.2.10": {
+    "3.2.10": {
       "name": "Male cousin relationships",
       "description": "Test male cousin relationships (gender-specific cousin, materialized)",
       "query": "SELECT ?cousinMale ?cousin WHERE { ?cousinMale :cousinMaleOf ?cousin . } ORDER BY ?cousinMale ?cousin",
@@ -436,7 +540,7 @@
         { "cousinMale": ":david", "cousin": ":eliza" }
       ]
     },
-    "1.2.11": {
+    "3.2.11": {
       "name": "Great-grandmother relationships",
       "description": "Test great-grandmother relationships (female great-grandparent, subproperty of greatGrandparentOf)",
       "query": "SELECT ?greatGrandmother ?greatGrandchild WHERE { ?greatGrandmother :greatGrandmotherOf ?greatGrandchild . } ORDER BY ?greatGrandmother ?greatGrandchild",
@@ -445,7 +549,7 @@
         { "greatGrandmother": ":eva", "greatGrandchild": ":eliza" }
       ]
     },
-    "1.2.12": {
+    "3.2.12": {
       "name": "Great-grandfather relationships",
       "description": "Test great-grandfather relationships (male great-grandparent, subproperty of greatGrandparentOf)",
       "query": "SELECT ?greatGrandfather ?greatGrandchild WHERE { ?greatGrandfather :greatGrandfatherOf ?greatGrandchild . } ORDER BY ?greatGrandfather ?greatGrandchild",
@@ -454,7 +558,7 @@
         { "greatGrandfather": ":adam", "greatGrandchild": ":eliza" }
       ]
     },
-    "1.2.13": {
+    "3.2.13": {
       "name": "Great-granddaughter relationships",
       "description": "Test great-granddaughter relationships (female great-grandchild, subproperty of greatGrandchildOf)",
       "query": "SELECT ?greatGranddaughter ?greatGrandparent WHERE { ?greatGranddaughter :greatGranddaughterOf ?greatGrandparent . } ORDER BY ?greatGranddaughter ?greatGrandparent",
@@ -463,7 +567,7 @@
         { "greatGranddaughter": ":eliza", "greatGrandparent": ":eva" }
       ]
     },
-    "1.2.14": {
+    "3.2.14": {
       "name": "Great-grandson relationships",
       "description": "Test great-grandson relationships (male great-grandchild, subproperty of greatGrandchildOf)",
       "query": "SELECT ?greatGrandson ?greatGrandparent WHERE { ?greatGrandson :greatGrandsonOf ?greatGrandparent . } ORDER BY ?greatGrandson ?greatGrandparent",
@@ -472,7 +576,7 @@
         { "greatGrandson": ":david", "greatGrandparent": ":eva" }
       ]
     },
-    "2.1.1": {
+    "4.1.1": {
       "name": "Parent-in-law relationships",
       "description": "Test parent-in-law relationships (inferred, inverse of child-in-law)",
       "query": "SELECT ?parentInLaw ?childInLaw WHERE { ?parentInLaw :parentInLawOf ?childInLaw . } ORDER BY ?parentInLaw ?childInLaw",
@@ -484,7 +588,7 @@
         { "parentInLaw": ":azura", "childInLaw": ":carl" }
       ]
     },
-    "2.1.2": {
+    "4.1.2": {
       "name": "Child-in-law relationships",
       "description": "Test child-in-law relationships (inferred, inverse of parent-in-law)",
       "query": "SELECT ?childInLaw ?parentInLaw WHERE { ?childInLaw :childInLawOf ?parentInLaw . } ORDER BY ?childInLaw ?parentInLaw",
@@ -496,7 +600,7 @@
         { "childInLaw": ":carl", "parentInLaw": ":azura" }
       ]
     },
-    "2.1.3": {
+    "4.1.3": {
       "name": "Sibling-in-law relationships",
       "description": "Test sibling-in-law relationships (inferred, symmetric)",
       "query": "SELECT ?siblingInLaw1 ?siblingInLaw2 WHERE { ?siblingInLaw1 :siblingInLawOf ?siblingInLaw2 . } ORDER BY ?siblingInLaw1 ?siblingInLaw2",
@@ -513,7 +617,7 @@
         { "siblingInLaw1": ":helen", "siblingInLaw2": ":carl" }
       ]
     },
-    "2.2.1": {
+    "4.2.1": {
       "name": "Mother-in-law relationships",
       "description": "Test mother-in-law relationships (female parent-in-law, subproperty of parentInLawOf)",
       "query": "SELECT ?motherInLaw ?childInLaw WHERE { ?motherInLaw :motherInLawOf ?childInLaw . } ORDER BY ?motherInLaw ?childInLaw",
@@ -523,7 +627,7 @@
         { "motherInLaw": ":eva", "childInLaw": ":antoine" }
       ]
     },
-    "2.2.2": {
+    "4.2.2": {
       "name": "Father-in-law relationships",
       "description": "Test father-in-law relationships (male parent-in-law, subproperty of parentInLawOf)",
       "query": "SELECT ?fatherInLaw ?childInLaw WHERE { ?fatherInLaw :fatherInLawOf ?childInLaw . } ORDER BY ?fatherInLaw ?childInLaw",
@@ -532,7 +636,7 @@
         { "fatherInLaw": ":adam", "childInLaw": ":antoine" }
       ]
     },
-    "2.2.3": {
+    "4.2.3": {
       "name": "Daughter-in-law relationships",
       "description": "Test daughter-in-law relationships (female child-in-law, subproperty of childInLawOf)",
       "query": "SELECT ?daughterInLaw ?parentInLaw WHERE { ?daughterInLaw :daughterInLawOf ?parentInLaw . } ORDER BY ?daughterInLaw ?parentInLaw",
@@ -541,7 +645,7 @@
         { "daughterInLaw": ":ada", "parentInLaw": ":eva" }
       ]
     },
-    "2.2.4": {
+    "4.2.4": {
       "name": "Son-in-law relationships",
       "description": "Test son-in-law relationships (male child-in-law, subproperty of childInLawOf)",
       "query": "SELECT ?sonInLaw ?parentInLaw WHERE { ?sonInLaw :sonInLawOf ?parentInLaw . } ORDER BY ?sonInLaw ?parentInLaw",
@@ -551,7 +655,7 @@
         { "sonInLaw": ":carl", "parentInLaw": ":azura" }
       ]
     },
-    "2.2.5": {
+    "4.2.5": {
       "name": "Sister-in-law relationships",
       "description": "Test sister-in-law relationships (female sibling-in-law, subproperty of siblingInLawOf)",
       "query": "SELECT ?sisterInLaw ?siblingInLaw WHERE { ?sisterInLaw :sisterInLawOf ?siblingInLaw . } ORDER BY ?sisterInLaw ?siblingInLaw",
@@ -562,7 +666,7 @@
         { "sisterInLaw": ":helen", "siblingInLaw": ":carl" }
       ]
     },
-    "2.2.6": {
+    "4.2.6": {
       "name": "Brother-in-law relationships",
       "description": "Test brother-in-law relationships (male sibling-in-law, subproperty of siblingInLawOf)",
       "query": "SELECT ?brotherInLaw ?siblingInLaw WHERE { ?brotherInLaw :brotherInLawOf ?siblingInLaw . } ORDER BY ?brotherInLaw ?siblingInLaw",
@@ -575,7 +679,7 @@
         { "brotherInLaw": ":carl", "siblingInLaw": ":helen" }
       ]
     },
-    "3.1.1": {
+    "5.1.1": {
       "name": "Step parent relationships",
       "description": "Test step parent relationships (spouse's child from previous relationship)",
       "query": "SELECT ?stepParent ?stepChild WHERE { ?stepParent :stepParentOf ?stepChild . } ORDER BY ?stepParent ?stepChild",
@@ -586,7 +690,7 @@
         { "stepParent": ":carl", "stepChild": ":eliza" }
       ]
     },
-    "3.1.2": {
+    "5.1.2": {
       "name": "Step child relationships",
       "description": "Test step child relationships (inverse of stepParentOf)",
       "query": "SELECT ?stepChild ?stepParent WHERE { ?stepChild :stepChildOf ?stepParent . } ORDER BY ?stepChild ?stepParent",
@@ -597,7 +701,7 @@
         { "stepChild": ":fiona", "stepParent": ":azura" }
       ]
     },
-    "3.1.3": {
+    "5.1.3": {
       "name": "Step sibling relationships",
       "description": "Test step sibling relationships (siblings with no shared biological parent)",
       "query": "SELECT ?stepSibling1 ?stepSibling2 WHERE { ?stepSibling1 :stepSiblingOf ?stepSibling2 . } ORDER BY ?stepSibling1 ?stepSibling2",
@@ -608,7 +712,7 @@
         { "stepSibling1": ":fiona", "stepSibling2": ":carol" }
       ]
     },
-    "3.1.4": {
+    "5.1.4": {
       "name": "Half sibling relationships",
       "description": "Test half sibling relationships (siblings sharing only one parent)",
       "query": "SELECT ?halfSibling1 ?halfSibling2 WHERE { ?halfSibling1 :halfSiblingOf ?halfSibling2 . } ORDER BY ?halfSibling1 ?halfSibling2",
@@ -621,7 +725,7 @@
         { "halfSibling1": ":helen", "halfSibling2": ":fiona" }
       ]
     },
-    "3.2.1": {
+    "5.2.1": {
       "name": "Step mother relationships",
       "description": "Test step mother relationships (female step parent, subproperty of stepParentOf)",
       "query": "SELECT ?stepMother ?stepChild WHERE { ?stepMother :stepMotherOf ?stepChild . } ORDER BY ?stepMother ?stepChild",
@@ -629,7 +733,7 @@
         { "stepMother": ":azura", "stepChild": ":fiona" }
       ]
     },
-    "3.2.2": {
+    "5.2.2": {
       "name": "Step father relationships",
       "description": "Test step father relationships (male step parent, subproperty of stepParentOf)",
       "query": "SELECT ?stepFather ?stepChild WHERE { ?stepFather :stepFatherOf ?stepChild . } ORDER BY ?stepFather ?stepChild",
@@ -639,7 +743,7 @@
         { "stepFather": ":carl", "stepChild": ":eliza" }
       ]
     },
-    "3.2.3": {
+    "5.2.3": {
       "name": "Step daughter relationships",
       "description": "Test step daughter relationships (female step child, subproperty of stepChildOf)",
       "query": "SELECT ?stepDaughter ?stepParent WHERE { ?stepDaughter :stepDaughterOf ?stepParent . } ORDER BY ?stepDaughter ?stepParent",
@@ -649,7 +753,7 @@
         { "stepDaughter": ":fiona", "stepParent": ":azura" }
       ]
     },
-    "3.2.4": {
+    "5.2.4": {
       "name": "Step son relationships",
       "description": "Test step son relationships (male step child, subproperty of stepChildOf)",
       "query": "SELECT ?stepSon ?stepParent WHERE { ?stepSon :stepSonOf ?stepParent . } ORDER BY ?stepSon ?stepParent",
@@ -657,7 +761,7 @@
         { "stepSon": ":bob", "stepParent": ":antoine" }
       ]
     },
-    "3.2.5": {
+    "5.2.5": {
       "name": "Step sister relationships",
       "description": "Test step sister relationships (female step sibling, subproperty of stepSiblingOf)",
       "query": "SELECT ?stepSister ?stepSibling WHERE { ?stepSister :stepSisterOf ?stepSibling . } ORDER BY ?stepSister ?stepSibling",
@@ -667,7 +771,7 @@
         { "stepSister": ":fiona", "stepSibling": ":carol" }
       ]
     },
-    "3.2.6": {
+    "5.2.6": {
       "name": "Step brother relationships",
       "description": "Test step brother relationships (male step sibling, subproperty of stepSiblingOf)",
       "query": "SELECT ?stepBrother ?stepSibling WHERE { ?stepBrother :stepBrotherOf ?stepSibling . } ORDER BY ?stepBrother ?stepSibling",
@@ -675,7 +779,7 @@
         { "stepBrother": ":bob", "stepSibling": ":fiona" }
       ]
     },
-    "3.2.7": {
+    "5.2.7": {
       "name": "Half sister relationships",
       "description": "Test half sister relationships (female half sibling, subproperty of halfSiblingOf)",
       "query": "SELECT ?halfSister ?halfSibling WHERE { ?halfSister :halfSisterOf ?halfSibling . } ORDER BY ?halfSister ?halfSibling",
@@ -687,7 +791,7 @@
         { "halfSister": ":helen", "halfSibling": ":fiona" }
       ]
     },
-    "3.2.8": {
+    "5.2.8": {
       "name": "Half brother relationships",
       "description": "Test half brother relationships (male half sibling, subproperty of halfSiblingOf)",
       "query": "SELECT ?halfBrother ?halfSibling WHERE { ?halfBrother :halfBrotherOf ?halfSibling . } ORDER BY ?halfBrother ?halfSibling",
@@ -695,7 +799,7 @@
         { "halfBrother": ":bob", "halfSibling": ":helen" }
       ]
     },
-    "4.1.1": {
+    "6.1.1": {
       "name": "Twin relationships",
       "description": "Test twin relationships (symmetric, irreflexive)",
       "query": "SELECT ?twin1 ?twin2 WHERE { ?twin1 :twinOf ?twin2 . } ORDER BY ?twin1 ?twin2",
@@ -704,7 +808,7 @@
         { "twin1": ":carol", "twin2": ":bob" }
       ]
     },
-    "6.1.1": {
+    "8.1.1": {
       "name": "Godparent relationships",
       "description": "Test godparent relationships (direct property)",
       "query": "SELECT ?godParent ?godChild WHERE { ?godParent :godParentOf ?godChild . } ORDER BY ?godParent ?godChild",
@@ -713,7 +817,7 @@
         { "godParent": ":hercule", "godChild": ":abel" }
       ]
     },
-    "6.1.2": {
+    "8.1.2": {
       "name": "Godchild relationships",
       "description": "Test godchild relationships (inverse of godParentOf)",
       "query": "SELECT ?godChild ?godParent WHERE { ?godChild :godChildOf ?godParent . } ORDER BY ?godChild ?godParent",
@@ -722,7 +826,7 @@
         { "godChild": ":azura", "godParent": ":athena" }
       ]
     },
-    "6.1.3": {
+    "8.1.3": {
       "name": "Witness relationships",
       "description": "Test witness relationships (marriage witness)",
       "query": "SELECT ?witness ?person WHERE { ?witness :witnessOf ?person . } ORDER BY ?witness ?person",
@@ -731,7 +835,7 @@
         { "witness": ":hercule", "person": ":adam" }
       ]
     },
-    "6.2.1": {
+    "8.2.1": {
       "name": "Godmother relationships",
       "description": "Test godmother relationships (female godparent, subproperty of godParentOf)",
       "query": "SELECT ?godmother ?godchild WHERE { ?godmother :godmotherOf ?godchild . } ORDER BY ?godmother ?godchild",
@@ -739,7 +843,7 @@
         { "godmother": ":athena", "godchild": ":azura" }
       ]
     },
-    "6.2.2": {
+    "8.2.2": {
       "name": "Godfather relationships",
       "description": "Test godfather relationships (male godparent, subproperty of godParentOf)",
       "query": "SELECT ?godfather ?godchild WHERE { ?godfather :godfatherOf ?godchild . } ORDER BY ?godfather ?godchild",
@@ -747,7 +851,7 @@
         { "godfather": ":hercule", "godchild": ":abel" }
       ]
     },
-    "6.2.3": {
+    "8.2.3": {
       "name": "Goddaughter relationships",
       "description": "Test goddaughter relationships (female godchild, subproperty of godChildOf)",
       "query": "SELECT ?goddaughter ?godparent WHERE { ?goddaughter :goddaughterOf ?godparent . } ORDER BY ?goddaughter ?godparent",
@@ -755,7 +859,7 @@
         { "goddaughter": ":azura", "godparent": ":athena" }
       ]
     },
-    "6.2.4": {
+    "8.2.4": {
       "name": "Godson relationships",
       "description": "Test godson relationships (male godchild, subproperty of godChildOf)",
       "query": "SELECT ?godson ?godparent WHERE { ?godson :godsonOf ?godparent . } ORDER BY ?godson ?godparent",
@@ -763,7 +867,7 @@
         { "godson": ":abel", "godparent": ":hercule" }
       ]
     },
-    "7.1.1": {
+    "9.1.1": {
       "name": "Friend relationships",
       "description": "Test friend relationships (direct property, symmetric)",
       "query": "SELECT ?friend1 ?friend2 WHERE { ?friend1 :friendOf ?friend2 . } ORDER BY ?friend1 ?friend2",
@@ -778,7 +882,7 @@
         { "friend1": ":hercule", "friend2": ":eva" }
       ]
     },
-    "7.1.2": {
+    "9.1.2": {
       "name": "Close friend relationships",
       "description": "Test close friend relationships (subproperty of friendOf, symmetric)",
       "query": "SELECT ?closeFriend1 ?closeFriend2 WHERE { ?closeFriend1 :closeFriendOf ?closeFriend2 . } ORDER BY ?closeFriend1 ?closeFriend2",
